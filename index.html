@@ -757,61 +757,61 @@
 
             <div class="auth-card">
                 <!-- Login -->
-                <div id="screenLogin">
+                <form id="screenLogin" onsubmit="return false">
                     <div id="loginErr" class="status error" style="margin-bottom:1rem"></div>
                     <div class="form-group">
-                        <label>E-mailadres</label>
+                        <label for="loginEmail">E-mailadres</label>
                         <input type="email" id="loginEmail" placeholder="uw@email.com" autocomplete="email">
                     </div>
                     <div class="form-group">
-                        <label>Wachtwoord</label>
+                        <label for="loginPass">Wachtwoord</label>
                         <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
                     </div>
-                    <button id="loginBtn">Inloggen</button>
+                    <button type="submit" id="loginBtn">Inloggen</button>
                     <div class="toggle-auth">
-                        <button class="btn-link" id="showForgotBtn">Wachtwoord vergeten?</button>
+                        <button type="button" class="btn-link" id="showForgotBtn">Wachtwoord vergeten?</button>
                     </div>
                     <div class="toggle-auth">
-                        Geen account? <button class="btn-link" id="toSignupBtn">Registreer</button>
+                        Geen account? <button type="button" class="btn-link" id="toSignupBtn">Registreer</button>
                     </div>
-                </div>
+                </form>
 
                 <!-- Signup -->
-                <div id="screenSignup" style="display:none">
+                <form id="screenSignup" style="display:none" onsubmit="return false">
                     <div id="signupErr" class="status error" style="margin-bottom:1rem"></div>
                     <div class="form-group">
-                        <label>E-mailadres</label>
+                        <label for="signupEmail">E-mailadres</label>
                         <input type="email" id="signupEmail" placeholder="uw@email.com" autocomplete="email">
                     </div>
                     <div class="form-group">
-                        <label>Wachtwoord</label>
+                        <label for="signupPass">Wachtwoord</label>
                         <input type="password" id="signupPass" placeholder="Min. 6 tekens" autocomplete="new-password">
                     </div>
                     <div class="form-group">
-                        <label>Uw naam</label>
+                        <label for="signupName">Uw naam</label>
                         <input type="text" id="signupName" placeholder="bijv. Moeder of Vader">
                     </div>
-                    <button id="signupBtn">Account aanmaken</button>
+                    <button type="submit" id="signupBtn">Account aanmaken</button>
                     <div class="toggle-auth">
-                        Al een account? <button class="btn-link" id="toLoginBtn">Inloggen</button>
+                        Al een account? <button type="button" class="btn-link" id="toLoginBtn">Inloggen</button>
                     </div>
-                </div>
+                </form>
 
                 <!-- Forgot password -->
-                <div id="screenForgot" style="display:none">
+                <form id="screenForgot" style="display:none" onsubmit="return false">
                     <p style="font-size:13px;margin-bottom:1rem;color:var(--dark-brown)">
                         Vul uw e-mailadres in en u ontvangt een link om uw wachtwoord te resetten.
                     </p>
                     <div id="forgotMsg" class="status" style="margin-bottom:1rem"></div>
                     <div class="form-group">
-                        <label>E-mailadres</label>
+                        <label for="forgotEmail">E-mailadres</label>
                         <input type="email" id="forgotEmail" placeholder="uw@email.com">
                     </div>
-                    <button id="forgotSendBtn">Reset-link versturen</button>
+                    <button type="submit" id="forgotSendBtn">Reset-link versturen</button>
                     <div class="toggle-auth">
-                        <button class="btn-link" id="backToLoginBtn">Terug naar inloggen</button>
+                        <button type="button" class="btn-link" id="backToLoginBtn">Terug naar inloggen</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
