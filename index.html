@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Shared Cookbook OCR search app - search recipes by ingredient and chapter">
+    <meta name="description" content="Gedeelde kookboek OCR zoek-app - zoek recepten op ingrediënt en hoofdstuk">
     <meta name="theme-color" content="#ffffff">
-    <title>Cookbook Search - Shared</title>
+    <title>Kookboek Zoeken - Gedeeld</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -510,41 +510,41 @@
     <div class="container">
         <div id="authContainer" style="display: none;">
             <div class="auth-screen">
-                <h2 id="authTitle">Sign up to get started</h2>
+                <h2 id="authTitle">Registreer om te beginnen</h2>
                 
                 <div id="signupForm">
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="email" placeholder="your@email.com">
+                        <label>E-mailadres</label>
+                        <input type="email" id="email" placeholder="uw@email.com">
                     </div>
                     <div class="form-group">
-                        <label>Password</label>
+                        <label>Wachtwoord</label>
                         <input type="password" id="password" placeholder="••••••••">
                     </div>
                     <div class="form-group">
-                        <label>Your name</label>
-                        <input type="text" id="name" placeholder="e.g., Mom">
+                        <label>Uw naam</label>
+                        <input type="text" id="name" placeholder="bijv. Moeder">
                     </div>
-                    <div id="errorMsg" style="color: var(--color-error); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
-                    <button id="signupBtn">Create account</button>
+                    <div id="errorMsg" style="color: var(--burnt-orange); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
+                    <button id="signupBtn">Account aanmaken</button>
                     <div class="toggle-auth">
-                        Already have an account? <button id="toggleToLogin">Sign in</button>
+                        Hebt u al een account? <button id="toggleToLogin">Inloggen</button>
                     </div>
                 </div>
 
                 <div id="loginForm" style="display: none;">
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="loginEmail" placeholder="your@email.com">
+                        <label>E-mailadres</label>
+                        <input type="email" id="loginEmail" placeholder="uw@email.com">
                     </div>
                     <div class="form-group">
-                        <label>Password</label>
+                        <label>Wachtwoord</label>
                         <input type="password" id="loginPassword" placeholder="••••••••">
                     </div>
-                    <div id="loginErrorMsg" style="color: var(--color-error); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
-                    <button id="loginBtn">Sign in</button>
+                    <div id="loginErrorMsg" style="color: var(--burnt-orange); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
+                    <button id="loginBtn">Inloggen</button>
                     <div class="toggle-auth">
-                        Need an account? <button id="toggleToSignup">Sign up</button>
+                        Geen account? <button id="toggleToSignup">Registreer</button>
                     </div>
                 </div>
             </div>
@@ -552,52 +552,99 @@
 
         <div id="appContainer" style="display: none;">
             <div class="header">
-                <h1>📚 Cookbook Search</h1>
-                <p>Find recipes by chapter and ingredient</p>
-                <div class="user-info">Signed in as <strong id="userDisplay"></strong></div>
+                <h1>📚 Kookboek Zoeken</h1>
+                <p>Vind recepten op hoofdstuk en ingrediënt</p>
+                <div class="user-info">Ingelogd als <strong id="userDisplay"></strong></div>
             </div>
 
             <div class="tabs">
-                <button class="tab-btn active" data-tab="upload">Add cookbooks</button>
-                <button class="tab-btn" data-tab="browse">Browse & search</button>
+                <button class="tab-btn active" data-tab="upload">Kookboeken toevoegen</button>
+                <button class="tab-btn" data-tab="isbn-lookup">Op ISBN zoeken</button>
+                <button class="tab-btn" data-tab="browse">Bladeren & zoeken</button>
             </div>
 
             <div id="upload" class="tab-content active">
                 <div class="status" id="status"></div>
 
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📸</div>
-                    <div class="upload-text">Upload cookbook photos</div>
-                    <div class="upload-hint">Tap to select or drag files here</div>
-                    <input type="file" id="fileInput" accept="image/*" multiple>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem;">
+                    <button id="cameraBtn" style="background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        📷 Camera
+                    </button>
+                    <button id="galleryBtn" style="background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        🖼️ Galerij
+                    </button>
+                </div>
+
+                <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+
+                <div id="cameraPreview" style="display: none; background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--olive-green); margin-bottom: 1rem; font-size: 16px;">Gemaakte foto's:</h3>
+                    <div id="previewList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;"></div>
+                    <button id="takeProceedBtn" style="width: 100%; background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; border: none;">Doorgaan met deze foto's</button>
                 </div>
 
                 <div class="instructions">
-                    <h3>How to use:</h3>
+                    <h3>Hoe het werkt:</h3>
                     <ol>
-                        <li>Photograph your cookbook's <strong>table of contents</strong></li>
-                        <li>Photograph the <strong>ingredient index</strong> pages</li>
-                        <li>Upload photos here (TOC first, then ingredient list)</li>
-                        <li>Browse by chapter and filter by ingredients</li>
-                        <li>Check the physical book for the full recipe</li>
+                        <li>Kies <strong>"Camera"</strong> voor directe camera-opname</li>
+                        <li>Fotografeer de <strong>inhoudsopgave</strong> van uw kookboek</li>
+                        <li>Fotografeer de <strong>ingrediëntenindex</strong> pagina's</li>
+                        <li>Klik "Doorgaan met deze foto's"</li>
+                        <li>De app verwerkt de foto's automatisch</li>
                     </ol>
                 </div>
             </div>
 
-            <div id="browse" class="tab-content">
+            <div id="isbn-lookup" class="tab-content">
+                <div class="status" id="isbnStatus"></div>
+
+                <div style="background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="form-group">
+                        <label style="color: var(--olive-green);">ISBN-nummer</label>
+                        <input type="text" id="isbnInput" placeholder="bijv. 9781445425641 of 978-1445-425641">
+                    </div>
+                    <button id="isbnSearchBtn" style="width: 100%;">ISBN opzoeken</button>
+                </div>
+
+                <div id="isbnResults" style="display: none;">
+                    <div style="background: var(--cream); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem;">
+                        <div class="form-group">
+                            <label style="color: var(--olive-green);">Titel</label>
+                            <input type="text" id="isbnTitle" readonly style="background: var(--light-tan);">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: var(--olive-green);">Auteur</label>
+                            <input type="text" id="isbnAuthor" readonly style="background: var(--light-tan);">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: var(--olive-green);">ISBN</label>
+                            <input type="text" id="isbnDisplay" readonly style="background: var(--light-tan);">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="isbnUseBtn" style="flex: 1; background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%);">Gebruiken voor foto's</button>
+                            <button id="isbnResetBtn" style="flex: 1; background: var(--sage-green);">Opnieuw zoeken</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; color: var(--warm-orange); font-style: italic; margin-top: 2rem;">
+                    <p>Voer het ISBN-nummer in van uw kookboek en upload vervolgens de foto's van de inhoudsopgave en ingrediëntenindex.</p>
+                </div>
+            </div>
                 <div id="browsePlaceholder" class="empty-state">
-                    <p>No cookbooks added yet.</p>
-                    <p style="font-size: 12px; margin-top: 0.5rem;">Go to "Add cookbooks" to upload your first cookbook.</p>
+                    <p>Nog geen kookboeken toegevoegd.</p>
+                    <p style="font-size: 12px; margin-top: 0.5rem;">Ga naar "Kookboeken toevoegen" om uw eerste kookboek te uploaden.</p>
                 </div>
 
                 <div id="stats" class="stats" style="display: none;">
                     <div class="stat-card">
                         <div class="stat-number" id="totalChapters">0</div>
-                        <div class="stat-label">Chapters</div>
+                        <div class="stat-label">Hoofdstukken</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="totalIngredients">0</div>
-                        <div class="stat-label">Ingredients</div>
+                        <div class="stat-label">Ingrediënten</div>
                     </div>
                 </div>
 
@@ -605,14 +652,14 @@
                 
                 <div id="filterSection" style="display: none;">
                     <div class="filter-box">
-                        <div class="filter-label">Filter by ingredient (optional)</div>
-                        <input type="text" id="ingredientFilter" placeholder="Type ingredient...">
+                        <div class="filter-label">Filter op ingrediënt (optioneel)</div>
+                        <input type="text" id="ingredientFilter" placeholder="Type ingrediënt, bijv. 'kip', 'tomaat', 'kaas'...">
                     </div>
                     <div id="resultsSection"></div>
                 </div>
             </div>
 
-            <button class="logout-btn" id="logoutBtn">Sign out</button>
+            <button class="logout-btn" id="logoutBtn">Afmelden</button>
         </div>
     </div>
 
@@ -735,6 +782,7 @@
                 
                 showAppUI();
                 setupEventListeners();
+                setupCameraPreviewListener();
             } else {
                 showAuthUI();
             }
@@ -766,18 +814,180 @@
             });
 
             document.getElementById('fileInput').addEventListener('change', (e) => handleFiles(e.target.files));
+            document.getElementById('cameraInput').addEventListener('change', (e) => handleCameraFiles(e.target.files));
             document.getElementById('ingredientFilter').addEventListener('input', () => filterRecipes());
+            
+            // Camera and gallery buttons
+            document.getElementById('cameraBtn').addEventListener('click', () => {
+                document.getElementById('cameraInput').click();
+            });
+            
+            document.getElementById('galleryBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            
+            document.getElementById('takeProceedBtn').addEventListener('click', () => {
+                const files = Array.from(document.getElementById('cameraPreview').dataset.files ? 
+                    JSON.parse(document.getElementById('cameraPreview').dataset.files) : []);
+                if (files.length > 0) {
+                    // Will be handled by handleCameraFiles
+                }
+            });
+            
+            // ISBN lookup listeners
+            document.getElementById('isbnSearchBtn').addEventListener('click', async () => {
+                const isbn = document.getElementById('isbnInput').value.trim();
+                if (!isbn) {
+                    showIsbnStatus('Voer een ISBN-nummer in', 'error');
+                    return;
+                }
+                await lookupISBN(isbn);
+            });
+            
+            document.getElementById('isbnUseBtn').addEventListener('click', () => {
+                const title = document.getElementById('isbnTitle').value;
+                document.getElementById('fileInput').click();
+                // Store the title for use after photo upload
+                sessionStorage.setItem('cookbookTitle', title);
+                sessionStorage.setItem('cookbookISBN', document.getElementById('isbnDisplay').value);
+            });
+            
+            document.getElementById('isbnResetBtn').addEventListener('click', () => {
+                document.getElementById('isbnInput').value = '';
+                document.getElementById('isbnResults').style.display = 'none';
+                clearIsbnStatus();
+            });
+        }
+
+        async function handleCameraFiles(files) {
+            const fileArray = Array.from(files);
+            if (fileArray.length === 0) return;
+            
+            // Show preview
+            const previewList = document.getElementById('previewList');
+            previewList.innerHTML = '';
+            
+            fileArray.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const photoLabel = index === 0 ? 'Inhoudsopgave' : 'Ingrediëntenindex';
+                    const previewItem = document.createElement('div');
+                    previewItem.style.cssText = 'padding: 10px; background: var(--cream); border-radius: 8px; border: 1px solid var(--olive-green);';
+                    previewItem.innerHTML = `
+                        <div style="font-weight: 600; color: var(--olive-green); margin-bottom: 8px;">${photoLabel}</div>
+                        <img src="${e.target.result}" style="width: 100%; border-radius: 6px; max-height: 200px; object-fit: cover;">
+                    `;
+                    previewList.appendChild(previewItem);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            document.getElementById('cameraPreview').style.display = 'block';
+            
+            // Store files for later processing
+            document.getElementById('cameraPreview').dataset.files = JSON.stringify(
+                fileArray.map(f => ({ name: f.name, size: f.size }))
+            );
+            document.getElementById('cameraPreview').dataset.fileObjects = fileArray;
+        }
+        
+        // Handle proceed with camera files
+        function setupCameraPreviewListener() {
+            document.getElementById('takeProceedBtn').addEventListener('click', async () => {
+                let cbName = sessionStorage.getItem('cookbookTitle');
+                
+                if (!cbName) {
+                    cbName = prompt('Kookboektitel?');
+                }
+                
+                if (!cbName) return;
+                
+                const isbn = sessionStorage.getItem('cookbookISBN');
+                const fileInputs = document.querySelectorAll('#cameraInput');
+                const lastInput = fileInputs[fileInputs.length - 1];
+                
+                if (lastInput && lastInput.files) {
+                    const fileArray = Array.from(lastInput.files);
+                    processCookbook(cbName, fileArray, 0, isbn);
+                    document.getElementById('cameraPreview').style.display = 'none';
+                    document.getElementById('previewList').innerHTML = '';
+                }
+                
+                // Clear stored data
+                sessionStorage.removeItem('cookbookTitle');
+                sessionStorage.removeItem('cookbookISBN');
+            });
         }
 
         async function handleFiles(files) {
-            const cbName = prompt('Cookbook title?');
+            let cbName = sessionStorage.getItem('cookbookTitle');
+            
+            if (!cbName) {
+                cbName = prompt('Kookboektitel?');
+            }
+            
             if (!cbName) return;
-
+            
+            const isbn = sessionStorage.getItem('cookbookISBN');
             const fileArray = Array.from(files);
-            processCookbook(cbName, fileArray, 0);
+            processCookbook(cbName, fileArray, 0, isbn);
+            
+            // Clear stored data
+            sessionStorage.removeItem('cookbookTitle');
+            sessionStorage.removeItem('cookbookISBN');
         }
 
-        async function processCookbook(cbName, files, index) {
+        async function lookupISBN(isbn) {
+            showIsbnStatus('ISBN wordt opgezocht...', 'processing');
+            
+            try {
+                // Try Google Books API first
+                const cleanISBN = isbn.replace(/[-\s]/g, '');
+                const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanISBN}&maxResults=1`);
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    const book = data.items[0].volumeInfo;
+                    document.getElementById('isbnTitle').value = book.title || 'Onbekend';
+                    document.getElementById('isbnAuthor').value = book.authors?.[0] || 'Onbekende auteur';
+                    document.getElementById('isbnDisplay').value = cleanISBN;
+                    document.getElementById('isbnResults').style.display = 'block';
+                    clearIsbnStatus();
+                    return;
+                }
+                
+                // Fallback to Open Library
+                const response2 = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanISBN}&jscmd=data&format=json`);
+                const data2 = await response2.json();
+                const key = `ISBN:${cleanISBN}`;
+                
+                if (data2[key]) {
+                    const book = data2[key];
+                    document.getElementById('isbnTitle').value = book.title || 'Onbekend';
+                    document.getElementById('isbnAuthor').value = book.authors?.[0]?.name || 'Onbekende auteur';
+                    document.getElementById('isbnDisplay').value = cleanISBN;
+                    document.getElementById('isbnResults').style.display = 'block';
+                    clearIsbnStatus();
+                    return;
+                }
+                
+                showIsbnStatus('ISBN niet gevonden. Voer gegevens handmatig in.', 'error');
+            } catch (err) {
+                showIsbnStatus('Fout bij opzoeken. Controleer uw internetverbinding.', 'error');
+            }
+        }
+        
+        function showIsbnStatus(msg, type) {
+            const status = document.getElementById('isbnStatus');
+            status.textContent = msg;
+            status.className = `status show ${type}`;
+        }
+        
+        function clearIsbnStatus() {
+            document.getElementById('isbnStatus').classList.remove('show');
+        }
+
+        async function processCookbook(cbName, files, index, isbn = null) {
             if (index >= files.length) {
                 return;
             }
@@ -794,7 +1004,7 @@
                     const text = result.data.text;
 
                     if (index === 0) {
-                        await processCookbook(cbName, files, index + 1);
+                        await processCookbook(cbName, files, index + 1, isbn);
                     } else {
                         // Save to Firebase
                         const chapters = extractChapters(text);
@@ -803,18 +1013,19 @@
                         await addDoc(collection(db, 'cookbooks'), {
                             userId: appState.user.uid,
                             title: cbName,
+                            isbn: isbn || null,
                             chapters: chapters,
                             ingredients: ingredients,
                             createdAt: new Date()
                         });
                         
-                        showStatus(`✓ "${cbName}" added!`, 'success');
+                        showStatus(`✓ "${cbName}" toegevoegd!`, 'success');
                         setTimeout(() => clearStatus(), 2000);
                     }
                 };
                 reader.readAsDataURL(file);
             } catch (err) {
-                showStatus('Error processing image', 'error');
+                showStatus('Fout bij verwerken van afbeelding', 'error');
             }
         }
 
@@ -885,7 +1096,7 @@
             container.innerHTML = appState.cookbooks.map(cb => `
                 <div class="cookbook-card">
                     <div class="cookbook-title">${cb.title}</div>
-                    <div class="cookbook-meta">${cb.chapters.length} chapters • ${cb.ingredients.length} ingredients</div>
+                    <div class="cookbook-meta">${cb.chapters.length} hoofdstukken • ${cb.ingredients.length} ingrediënten</div>
                     <div class="chapter-grid">
                         ${cb.chapters.map((ch, idx) => `
                             <button class="chapter-btn" onclick="window.selectChapter('${cb.id}', ${idx})">
