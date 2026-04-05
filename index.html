@@ -1348,10 +1348,11 @@ function extractChapters(text) {
         const page  = parseInt(pageStr);
         if (isNaN(page) || page < 1) continue;
 
-        // Strip leading single-char OCR noise: "f tajines…" → "tajines…"
-        name = name.replace(/^[a-zA-Z]\s+(?=[a-z])/, '').trim();
-        // Strip leading symbol noise: "— ", "| ", "= ", etc.
-        name = name.replace(/^[-=~*#|BE]+\s*/, '').trim();
+        // Strip leading single-char OCR noise: "f tajines…"→"tajines…", "1 tajines…"→"tajines…"
+        name = name.replace(/^[a-zA-Z0-9]\s+(?=[a-z])/, '').trim();
+        // Strip leading symbol/caps noise: "BE ", "— ", "| ", "= ", etc.
+        name = name.replace(/^[-=~*#|]+\s*/, '').trim();
+        name = name.replace(/^[A-Z]{1,3}\s+(?=[a-z])/, '').trim();
         // Strip trailing dots/spaces
         name = name.replace(/[.\s]+$/, '').trim();
 
