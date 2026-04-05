@@ -791,10 +791,15 @@
         function setupEventListeners() {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.getElementById(e.target.dataset.tab).classList.add('active');
-                    e.target.classList.add('active');
+                    const tabId = e.target.dataset.tab;
+                    const tabElement = document.getElementById(tabId);
+                    
+                    if (tabElement) {
+                        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        tabElement.classList.add('active');
+                        e.target.classList.add('active');
+                    }
                 });
             });
 
@@ -897,30 +902,35 @@
         
         // Handle proceed with camera files
         function setupCameraPreviewListener() {
-            document.getElementById('takeProceedBtn').addEventListener('click', async () => {
-                let cbName = sessionStorage.getItem('cookbookTitle');
-                
-                if (!cbName) {
-                    cbName = prompt('Kookboektitel?');
-                }
-                
-                if (!cbName) return;
-                
-                const isbn = sessionStorage.getItem('cookbookISBN');
-                const fileInputs = document.querySelectorAll('#cameraInput');
-                const lastInput = fileInputs[fileInputs.length - 1];
-                
-                if (lastInput && lastInput.files) {
-                    const fileArray = Array.from(lastInput.files);
-                    processCookbook(cbName, fileArray, 0, isbn);
-                    document.getElementById('cameraPreview').style.display = 'none';
-                    document.getElementById('previewList').innerHTML = '';
-                }
-                
-                // Clear stored data
-                sessionStorage.removeItem('cookbookTitle');
-                sessionStorage.removeItem('cookbookISBN');
-            });
+            const takeProceedBtn = document.getElementById('takeProceedBtn');
+            if (takeProceedBtn) {
+                takeProceedBtn.addEventListener('click', async () => {
+                    let cbName = sessionStorage.getItem('cookbookTitle');
+                    
+                    if (!cbName) {
+                        cbName = prompt('Kookboektitel?');
+                    }
+                    
+                    if (!cbName) return;
+                    
+                    const isbn = sessionStorage.getItem('cookbookISBN');
+                    const fileInputs = document.querySelectorAll('#cameraInput');
+                    const lastInput = fileInputs[fileInputs.length - 1];
+                    
+                    if (lastInput && lastInput.files && lastInput.files.length > 0) {
+                        const fileArray = Array.from(lastInput.files);
+                        processCookbook(cbName, fileArray, 0, isbn);
+                        const cameraPreview = document.getElementById('cameraPreview');
+                        const previewList = document.getElementById('previewList');
+                        if (cameraPreview) cameraPreview.style.display = 'none';
+                        if (previewList) previewList.innerHTML = '';
+                    }
+                    
+                    // Clear stored data
+                    sessionStorage.removeItem('cookbookTitle');
+                    sessionStorage.removeItem('cookbookISBN');
+                });
+            }
         }
 
         async function handleFiles(files) {
