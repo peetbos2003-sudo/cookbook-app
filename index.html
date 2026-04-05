@@ -1000,13 +1000,15 @@ kip 33, 44, 102"></textarea>
         <div style="padding:1rem;background:var(--cream)">
             <div style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:3/4">
                 <video id="scannerVideo" style="width:100%;height:100%;object-fit:cover" playsinline muted></video>
-                <!-- Aiming reticle -->
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-                    <div style="width:75%;height:30%;border:2px solid var(--warm-orange);border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,0.35)"></div>
+                <canvas id="scannerCanvas" style="display:none;width:100%;height:100%;object-fit:cover"></canvas>
+                <!-- Aiming reticle: narrow horizontal strip for ISBN digits -->
+                <div id="scannerReticle" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                    <div style="width:85%;height:12%;border:2px solid var(--warm-orange);border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,0.45)"></div>
                 </div>
             </div>
-            <div id="scannerStatus" class="status processing show" style="margin-top:1rem">
-                <span class="spinner"></span> Barcode zoeken…
+            <button id="scannerSnapBtn" class="btn-green" style="width:100%;margin-top:0.75rem;font-size:15px" disabled>📸 Foto nemen</button>
+            <div id="scannerStatus" class="status processing show" style="margin-top:0.75rem">
+                <span class="spinner"></span> Camera starten…
             </div>
         </div>
     </div>
@@ -1082,7 +1084,6 @@ kip 33, 44, 102"></textarea>
     </div>
 </div>
 
-<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
@@ -1922,30 +1923,74 @@ function switchTab(id) {
     document.querySelector(`[data-tab="${id}"]`).classList.add('active');
 }
 
-// ===== BARCODE SCANNER =====
-let scannerReader = null;
+// ===== ISBN TEXT SCANNER =====
+let scannerStream = null;
 
 get('isbnScanBtn').addEventListener('click', async () => {
+    const video  = get('scannerVideo');
+    const canvas = get('scannerCanvas');
+    video.style.display  = 'block';
+    canvas.style.display = 'none';
+    get('scannerReticle').style.display = 'flex';
+    get('scannerSnapBtn').disabled = true;
     get('scannerOverlay').classList.add('show');
     get('scannerStatus').className = 'status processing show';
     get('scannerStatus').innerHTML = '<span class="spinner"></span> Camera starten…';
+
     try {
-        const codeReader = new ZXing.BrowserMultiFormatReader();
-        scannerReader = codeReader;
-        await codeReader.decodeFromVideoDevice(null, 'scannerVideo', (result, err) => {
-            if (result) {
-                closeScanner();
-                get('isbnInput').value = result.getText();
-                lookupISBN();
-            }
-            if (err && !(err instanceof ZXing.NotFoundException)) {
-                console.warn('Scanner error:', err);
-            }
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
         });
-        get('scannerStatus').innerHTML = '<span class="spinner"></span> Barcode zoeken…';
+        video.srcObject = scannerStream;
+        await video.play();
+        get('scannerStatus').className = 'status show';
+        get('scannerStatus').textContent = 'Richt op het ISBN-nummer en neem een foto.';
+        get('scannerSnapBtn').disabled = false;
     } catch(e) {
         get('scannerStatus').className = 'status error show';
         get('scannerStatus').textContent = 'Camera niet beschikbaar: ' + e.message;
+    }
+});
+
+get('scannerSnapBtn').addEventListener('click', async () => {
+    const video  = get('scannerVideo');
+    const canvas = get('scannerCanvas');
+
+    // Freeze frame
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    video.style.display  = 'none';
+    canvas.style.display = 'block';
+    get('scannerReticle').style.display = 'none';
+    get('scannerSnapBtn').disabled = true;
+    get('scannerStatus').className = 'status processing show';
+    get('scannerStatus').innerHTML = '<span class="spinner"></span> Nummer lezen…';
+
+    try {
+        const result = await Tesseract.recognize(canvas, 'eng', {
+            tessedit_char_whitelist: '0123456789',
+            tessedit_pageseg_mode: '7',   // single text line
+        });
+        const digits = result.data.text.replace(/\D/g, '');
+        // Find a 10 or 13-digit ISBN within the result
+        const match = digits.match(/97[89]\d{10}|\d{10}/);
+        if (match) {
+            closeScanner();
+            get('isbnInput').value = match[0];
+            lookupISBN();
+        } else {
+            get('scannerStatus').className = 'status error show';
+            get('scannerStatus').textContent = 'Geen ISBN gevonden. Probeer opnieuw.';
+            video.style.display  = 'block';
+            canvas.style.display = 'none';
+            get('scannerReticle').style.display = 'flex';
+            get('scannerSnapBtn').disabled = false;
+        }
+    } catch(e) {
+        get('scannerStatus').className = 'status error show';
+        get('scannerStatus').textContent = 'Fout bij lezen: ' + e.message;
+        get('scannerSnapBtn').disabled = false;
     }
 });
 
@@ -1955,7 +2000,8 @@ get('scannerOverlay').addEventListener('click', e => {
 });
 
 function closeScanner() {
-    if (scannerReader) { scannerReader.reset(); scannerReader = null; }
+    if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
+    get('scannerVideo').srcObject = null;
     get('scannerOverlay').classList.remove('show');
 }
 </script>
