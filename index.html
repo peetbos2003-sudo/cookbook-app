@@ -559,7 +559,6 @@
 
             <div class="tabs">
                 <button class="tab-btn active" data-tab="upload">Kookboeken toevoegen</button>
-                <button class="tab-btn" data-tab="isbn-lookup">Op ISBN zoeken</button>
                 <button class="tab-btn" data-tab="browse">Bladeren & zoeken</button>
             </div>
 
@@ -622,42 +621,7 @@
                 </div>
             </div>
 
-            <div id="isbn-lookup" class="tab-content">
-                <div class="status" id="isbnStatus"></div>
-
-                <div style="background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <div class="form-group">
-                        <label style="color: var(--olive-green);">ISBN-nummer</label>
-                        <input type="text" id="isbnInput" placeholder="bijv. 9781445425641 of 978-1445-425641">
-                    </div>
-                    <button id="isbnSearchBtn" style="width: 100%;">ISBN opzoeken</button>
-                </div>
-
-                <div id="isbnResults" style="display: none;">
-                    <div style="background: var(--cream); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem;">
-                        <div class="form-group">
-                            <label style="color: var(--olive-green);">Titel</label>
-                            <input type="text" id="isbnTitle" readonly style="background: var(--light-tan);">
-                        </div>
-                        <div class="form-group">
-                            <label style="color: var(--olive-green);">Auteur</label>
-                            <input type="text" id="isbnAuthor" readonly style="background: var(--light-tan);">
-                        </div>
-                        <div class="form-group">
-                            <label style="color: var(--olive-green);">ISBN</label>
-                            <input type="text" id="isbnDisplay" readonly style="background: var(--light-tan);">
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button id="isbnUseBtn" style="flex: 1; background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%);">Gebruiken voor foto's</button>
-                            <button id="isbnResetBtn" style="flex: 1; background: var(--sage-green);">Opnieuw zoeken</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="text-align: center; color: var(--warm-orange); font-style: italic; margin-top: 2rem;">
-                    <p>Voer het ISBN-nummer in van uw kookboek en upload vervolgens de foto's van de inhoudsopgave en ingrediëntenindex.</p>
-                </div>
-            </div>
+            <div id="browse" class="tab-content">
                 <div id="browsePlaceholder" class="empty-state">
                     <p>Nog geen kookboeken toegevoegd.</p>
                     <p style="font-size: 12px; margin-top: 0.5rem;">Ga naar "Kookboeken toevoegen" om uw eerste kookboek te uploaden.</p>
@@ -907,38 +871,6 @@
                 });
             }
             
-            // ISBN lookup listeners
-            const isbnSearchBtn = document.getElementById('isbnSearchBtn');
-            if (isbnSearchBtn) {
-                isbnSearchBtn.addEventListener('click', async () => {
-                    const isbn = document.getElementById('isbnInput').value.trim();
-                    if (!isbn) {
-                        showIsbnStatus('Voer een ISBN-nummer in', 'error');
-                        return;
-                    }
-                    await lookupISBN(isbn);
-                });
-            }
-            
-            const isbnUseBtn = document.getElementById('isbnUseBtn');
-            if (isbnUseBtn) {
-                isbnUseBtn.addEventListener('click', () => {
-                    const title = document.getElementById('isbnTitle').value;
-                    if (fileInput) fileInput.click();
-                    // Store the title for use after photo upload
-                    sessionStorage.setItem('cookbookTitle', title);
-                    sessionStorage.setItem('cookbookISBN', document.getElementById('isbnDisplay').value);
-                });
-            }
-            
-            const isbnResetBtn = document.getElementById('isbnResetBtn');
-            if (isbnResetBtn) {
-                isbnResetBtn.addEventListener('click', () => {
-                    document.getElementById('isbnInput').value = '';
-                    document.getElementById('isbnResults').style.display = 'none';
-                    clearIsbnStatus();
-                });
-            }
         }
 
         async function handleCameraFiles(files) {
