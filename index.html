@@ -842,7 +842,8 @@
                     <label>ISBN-nummer (optioneel)</label>
                     <div class="inline-row">
                         <input type="text" id="isbnInput" placeholder="bijv. 9781445425641">
-                        <button id="isbnSearchBtn" class="btn-sm btn-green">Zoeken</button>
+                        <button type="button" id="isbnScanBtn" class="btn-sm btn-outline" title="Scan barcode met camera">📷 Scan</button>
+                        <button type="button" id="isbnSearchBtn" class="btn-sm btn-green">Zoeken</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -986,6 +987,31 @@ kip 33, 44, 102"></textarea>
     </div>
 </div>
 
+<!-- ===== BARCODE SCANNER OVERLAY ===== -->
+<div class="modal-overlay" id="scannerOverlay">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-header" style="justify-content:space-between;align-items:center">
+            <div class="modal-info">
+                <h2 style="font-size:16px">📷 Scan ISBN barcode</h2>
+                <div class="modal-author">Richt de camera op de barcode op de achterkant van het boek</div>
+            </div>
+            <button class="modal-close" id="scannerCloseBtn" style="width:30px;height:30px">×</button>
+        </div>
+        <div style="padding:1rem;background:var(--cream)">
+            <div style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:4/3">
+                <video id="scannerVideo" style="width:100%;height:100%;object-fit:cover" playsinline muted></video>
+                <!-- Aiming reticle -->
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                    <div style="width:75%;height:30%;border:2px solid var(--warm-orange);border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,0.35)"></div>
+                </div>
+            </div>
+            <div id="scannerStatus" class="status processing show" style="margin-top:1rem">
+                <span class="spinner"></span> Barcode zoeken…
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ===== COOKBOOK DETAIL MODAL ===== -->
 <div class="modal-overlay" id="cookbookModal">
     <div class="modal">
@@ -1056,6 +1082,7 @@ kip 33, 44, 102"></textarea>
     </div>
 </div>
 
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
@@ -1893,6 +1920,44 @@ function switchTab(id) {
     document.querySelectorAll('.tab-btn')    .forEach(b => b.classList.remove('active'));
     get(id).classList.add('active');
     document.querySelector(`[data-tab="${id}"]`).classList.add('active');
+}
+
+// ===== BARCODE SCANNER =====
+let scannerReader = null;
+
+get('isbnScanBtn').addEventListener('click', async () => {
+    get('scannerOverlay').classList.add('show');
+    get('scannerStatus').className = 'status processing show';
+    get('scannerStatus').innerHTML = '<span class="spinner"></span> Camera starten…';
+    try {
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+        scannerReader = codeReader;
+        await codeReader.decodeFromVideoDevice(null, 'scannerVideo', (result, err) => {
+            if (result) {
+                const isbn = result.getText();
+                closeScanner();
+                get('isbnInput').value = isbn;
+                lookupISBN();
+            }
+            if (err && !(err instanceof ZXing.NotFoundException)) {
+                console.warn('Scanner error:', err);
+            }
+        });
+        get('scannerStatus').innerHTML = '<span class="spinner"></span> Barcode zoeken…';
+    } catch(e) {
+        get('scannerStatus').className = 'status error show';
+        get('scannerStatus').textContent = 'Camera niet beschikbaar: ' + e.message;
+    }
+});
+
+get('scannerCloseBtn').addEventListener('click', closeScanner);
+get('scannerOverlay').addEventListener('click', e => {
+    if (e.target === get('scannerOverlay')) closeScanner();
+});
+
+function closeScanner() {
+    if (scannerReader) { scannerReader.reset(); scannerReader = null; }
+    get('scannerOverlay').classList.remove('show');
 }
 </script>
 </body>
