@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shared Cookbook OCR search app - search recipes by ingredient and chapter">
+    <meta name="theme-color" content="#ffffff">
+    <title>Cookbook Search - Shared</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f5f5f5;
+            --color-bg-tertiary: #eeeeee;
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #666666;
+            --color-text-tertiary: #999999;
+            --color-border: #cccccc;
+            --color-border-light: #e0e0e0;
+            --color-info: #0066cc;
+            --color-info-bg: #e6f2ff;
+            --color-success: #00aa00;
+            --color-success-bg: #e6ffe6;
+            --color-error: #dd0000;
+            --color-error-bg: #ffe6e6;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg-primary: #1a1a1a;
+                --color-bg-secondary: #2d2d2d;
+                --color-bg-tertiary: #3a3a3a;
+                --color-text-primary: #ffffff;
+                --color-text-secondary: #cccccc;
+                --color-text-tertiary: #999999;
+                --color-border: #444444;
+                --color-border-light: #333333;
+                --color-info: #4da6ff;
+                --color-info-bg: #1a3d66;
+                --color-success: #4da64d;
+                --color-success-bg: #1a3a1a;
+                --color-error: #ff6666;
+                --color-error-bg: #4d1a1a;
+            }
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+            padding-bottom: 3rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+        
+        .user-info {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-top: 0.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-border-light);
+            overflow-x: auto;
+        }
+        
+        .tab-btn {
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn.active {
+            color: var(--color-text-primary);
+            border-bottom-color: var(--color-info);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .auth-screen {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+        }
+        
+        .auth-screen h2 {
+            font-size: 18px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--color-text-primary);
+        }
+        
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid var(--color-border-light);
+            border-radius: 8px;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 2px var(--color-info-bg);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            background: var(--color-info);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .toggle-auth {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 13px;
+        }
+        
+        .toggle-auth button {
+            width: auto;
+            background: transparent;
+            color: var(--color-info);
+            padding: 0;
+            font-weight: normal;
+        }
+        
+        .upload-area {
+            background: var(--color-bg-secondary);
+            border: 2px dashed var(--color-border);
+            border-radius: 12px;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--color-info);
+            background: var(--color-info-bg);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .instructions {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            background: var(--color-bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+        
+        .instructions h3 {
+            font-size: 14px;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+        }
+        
+        .status {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status.show {
+            display: flex;
+        }
+        
+        .status.processing {
+            background: var(--color-info-bg);
+            color: var(--color-info);
+        }
+        
+        .status.success {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        
+        .status.error {
+            background: var(--color-error-bg);
+            color: var(--color-error);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .cookbook-card {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 12px;
+        }
+        
+        .cookbook-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .cookbook-meta {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+        }
+        
+        .chapter-btn {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-light);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .chapter-btn:active {
+            background: var(--color-bg-tertiary);
+        }
+        
+        .chapter-btn.active {
+            background: var(--color-info-bg);
+            color: var(--color-info);
+            border-color: var(--color-info);
+        }
+        
+        .filter-box {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+        }
+        
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .recipe-result {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .recipe-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .recipe-info {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .logout-btn {
+            display: block;
+            margin-top: 2rem;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 8px 16px;
+            font-size: 12px;
+            background: var(--color-error);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="authContainer" style="display: none;">
+            <div class="auth-screen">
+                <h2 id="authTitle">Sign up to get started</h2>
+                
+                <div id="signupForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Your name</label>
+                        <input type="text" id="name" placeholder="e.g., Mom">
+                    </div>
+                    <div id="errorMsg" style="color: var(--color-error); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
+                    <button id="signupBtn">Create account</button>
+                    <div class="toggle-auth">
+                        Already have an account? <button id="toggleToLogin">Sign in</button>
+                    </div>
+                </div>
+
+                <div id="loginForm" style="display: none;">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••">
+                    </div>
+                    <div id="loginErrorMsg" style="color: var(--color-error); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
+                    <button id="loginBtn">Sign in</button>
+                    <div class="toggle-auth">
+                        Need an account? <button id="toggleToSignup">Sign up</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="appContainer" style="display: none;">
+            <div class="header">
+                <h1>📚 Cookbook Search</h1>
+                <p>Find recipes by chapter and ingredient</p>
+                <div class="user-info">Signed in as <strong id="userDisplay"></strong></div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="upload">Add cookbooks</button>
+                <button class="tab-btn" data-tab="browse">Browse & search</button>
+            </div>
+
+            <div id="upload" class="tab-content active">
+                <div class="status" id="status"></div>
+
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Upload cookbook photos</div>
+                    <div class="upload-hint">Tap to select or drag files here</div>
+                    <input type="file" id="fileInput" accept="image/*" multiple>
+                </div>
+
+                <div class="instructions">
+                    <h3>How to use:</h3>
+                    <ol>
+                        <li>Photograph your cookbook's <strong>table of contents</strong></li>
+                        <li>Photograph the <strong>ingredient index</strong> pages</li>
+                        <li>Upload photos here (TOC first, then ingredient list)</li>
+                        <li>Browse by chapter and filter by ingredients</li>
+                        <li>Check the physical book for the full recipe</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="browse" class="tab-content">
+                <div id="browsePlaceholder" class="empty-state">
+                    <p>No cookbooks added yet.</p>
+                    <p style="font-size: 12px; margin-top: 0.5rem;">Go to "Add cookbooks" to upload your first cookbook.</p>
+                </div>
+
+                <div id="stats" class="stats" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalChapters">0</div>
+                        <div class="stat-label">Chapters</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalIngredients">0</div>
+                        <div class="stat-label">Ingredients</div>
+                    </div>
+                </div>
+
+                <div id="cookbooksList"></div>
+                
+                <div id="filterSection" style="display: none;">
+                    <div class="filter-box">
+                        <div class="filter-label">Filter by ingredient (optional)</div>
+                        <input type="text" id="ingredientFilter" placeholder="Type ingredient...">
+                    </div>
+                    <div id="resultsSection"></div>
+                </div>
+            </div>
+
+            <button class="logout-btn" id="logoutBtn">Sign out</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
+    <script type="module">
+        const firebaseConfig = {
+            apiKey: "AIzaSyC61fB06PkQkB0EIK8C8zjvyUNQDajnztE",
+            authDomain: "cookbook-app-50168.firebaseapp.com",
+            projectId: "cookbook-app-50168",
+            storageBucket: "cookbook-app-50168.firebasestorage.app",
+            messagingSenderId: "764959426777",
+            appId: "1:764959426777:web:0331e7cce24252508956c8"
+        };
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const appState = {
+            user: null,
+            cookbooks: [],
+            selectedCookbook: null,
+            selectedChapter: null,
+        };
+
+        // Auth UI
+        function showAuthUI() {
+            document.getElementById('authContainer').style.display = 'block';
+            document.getElementById('appContainer').style.display = 'none';
+        }
+
+        function showAppUI() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            renderBrowse();
+        }
+
+        document.getElementById('toggleToLogin').addEventListener('click', () => {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = 'Sign in';
+        });
+
+        document.getElementById('toggleToSignup').addEventListener('click', () => {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = 'Sign up to get started';
+        });
+
+        document.getElementById('signupBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!email || !password || !name) {
+                errorMsg.textContent = 'Please fill in all fields';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                await addDoc(collection(db, 'users'), {
+                    uid: userCred.user.uid,
+                    name: name,
+                    email: email,
+                    createdAt: new Date()
+                });
+                errorMsg.style.display = 'none';
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorMsg = document.getElementById('loginErrorMsg');
+
+            if (!email || !password) {
+                errorMsg.textContent = 'Please fill in all fields';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                errorMsg.style.display = 'none';
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+        });
+
+        // Auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                appState.user = user;
+                document.getElementById('userDisplay').textContent = user.email.split('@')[0];
+                
+                // Listen to cookbooks
+                const q = query(collection(db, 'cookbooks'), where('userId', '==', user.uid));
+                onSnapshot(q, (snapshot) => {
+                    appState.cookbooks = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    renderBrowse();
+                });
+                
+                showAppUI();
+                setupEventListeners();
+            } else {
+                showAuthUI();
+            }
+        });
+
+        function setupEventListeners() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById(e.target.dataset.tab).classList.add('active');
+                    e.target.classList.add('active');
+                });
+            });
+
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.addEventListener('click', () => document.getElementById('fileInput').click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--color-info)';
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = 'var(--color-border)';
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--color-border)';
+                handleFiles(e.dataTransfer.files);
+            });
+
+            document.getElementById('fileInput').addEventListener('change', (e) => handleFiles(e.target.files));
+            document.getElementById('ingredientFilter').addEventListener('input', () => filterRecipes());
+        }
+
+        async function handleFiles(files) {
+            const cbName = prompt('Cookbook title?');
+            if (!cbName) return;
+
+            const fileArray = Array.from(files);
+            processCookbook(cbName, fileArray, 0);
+        }
+
+        async function processCookbook(cbName, files, index) {
+            if (index >= files.length) {
+                return;
+            }
+
+            const file = files[index];
+            const fileType = index === 0 ? 'table of contents' : 'ingredient index';
+            
+            showStatus(`Processing ${fileType}...`, 'processing');
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const result = await Tesseract.recognize(e.target.result, 'eng');
+                    const text = result.data.text;
+
+                    if (index === 0) {
+                        await processCookbook(cbName, files, index + 1);
+                    } else {
+                        // Save to Firebase
+                        const chapters = extractChapters(text);
+                        const ingredients = extractIngredients(text);
+                        
+                        await addDoc(collection(db, 'cookbooks'), {
+                            userId: appState.user.uid,
+                            title: cbName,
+                            chapters: chapters,
+                            ingredients: ingredients,
+                            createdAt: new Date()
+                        });
+                        
+                        showStatus(`✓ "${cbName}" added!`, 'success');
+                        setTimeout(() => clearStatus(), 2000);
+                    }
+                };
+                reader.readAsDataURL(file);
+            } catch (err) {
+                showStatus('Error processing image', 'error');
+            }
+        }
+
+        function extractChapters(text) {
+            const lines = text.split('\n').filter(l => l.trim());
+            const chapters = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : '';
+                
+                const pageMatch = nextLine.match(/^\d+$/);
+                if (pageMatch && !line.match(/^\d+$/) && line.length > 2 && line.length < 100) {
+                    chapters.push({
+                        name: line,
+                        startPage: parseInt(pageMatch[0])
+                    });
+                }
+            }
+            return chapters;
+        }
+
+        function extractIngredients(text) {
+            const lines = text.split('\n').filter(l => l.trim());
+            const ingredients = [];
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+
+                const match = trimmed.match(/^([A-Za-z\s\-']+?)(\s+\d+(?:\s*-\s*\d+)?)?$/);
+                
+                if (match) {
+                    const name = match[1].trim().toLowerCase();
+                    const pages = match[2] ? match[2].trim() : null;
+                    
+                    if (name.length > 2 && name.length < 60 && !name.match(/^\d/)) {
+                        ingredients.push({ name, pages });
+                    }
+                }
+            }
+            return ingredients;
+        }
+
+        function renderBrowse() {
+            const container = document.getElementById('cookbooksList');
+            const placeholder = document.getElementById('browsePlaceholder');
+            const filterSection = document.getElementById('filterSection');
+            const stats = document.getElementById('stats');
+
+            if (appState.cookbooks.length === 0) {
+                container.innerHTML = '';
+                placeholder.style.display = 'block';
+                filterSection.style.display = 'none';
+                stats.style.display = 'none';
+                return;
+            }
+
+            placeholder.style.display = 'none';
+            stats.style.display = 'grid';
+
+            const totalChapters = appState.cookbooks.reduce((sum, cb) => sum + cb.chapters.length, 0);
+            const totalIngredients = appState.cookbooks.reduce((sum, cb) => sum + cb.ingredients.length, 0);
+            
+            document.getElementById('totalChapters').textContent = totalChapters;
+            document.getElementById('totalIngredients').textContent = totalIngredients;
+
+            container.innerHTML = appState.cookbooks.map(cb => `
+                <div class="cookbook-card">
+                    <div class="cookbook-title">${cb.title}</div>
+                    <div class="cookbook-meta">${cb.chapters.length} chapters • ${cb.ingredients.length} ingredients</div>
+                    <div class="chapter-grid">
+                        ${cb.chapters.map((ch, idx) => `
+                            <button class="chapter-btn" onclick="window.selectChapter('${cb.id}', ${idx})">
+                                ${ch.name}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            if (appState.selectedCookbook) {
+                filterSection.style.display = 'block';
+                filterRecipes();
+            }
+        }
+
+        window.selectChapter = (cbId, chapterId) => {
+            appState.selectedCookbook = appState.cookbooks.find(c => c.id === cbId);
+            appState.selectedChapter = appState.selectedCookbook.chapters[chapterId];
+            document.getElementById('ingredientFilter').value = '';
+            filterRecipes();
+        };
+
+        function filterRecipes() {
+            if (!appState.selectedChapter || !appState.selectedCookbook) return;
+
+            const filter = document.getElementById('ingredientFilter').value.toLowerCase();
+            const results = document.getElementById('resultsSection');
+
+            let matchedIngredients = [];
+            
+            if (filter) {
+                matchedIngredients = appState.selectedCookbook.ingredients
+                    .filter(ing => ing.name.includes(filter));
+            } else {
+                matchedIngredients = appState.selectedCookbook.ingredients.slice(0, 30);
+            }
+
+            if (matchedIngredients.length === 0) {
+                results.innerHTML = '<div class="empty-state">No matching ingredients found</div>';
+                return;
+            }
+
+            results.innerHTML = `
+                <div style="margin-bottom: 1rem;">
+                    <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 12px;">
+                        Found ${matchedIngredients.length} ingredient${matchedIngredients.length !== 1 ? 's' : ''} in <strong>${appState.selectedChapter.name}</strong>
+                    </p>
+                    ${matchedIngredients.map(ing => `
+                        <div class="recipe-result">
+                            <div class="recipe-title">${ing.name}</div>
+                            <div class="recipe-info">Pages: ${ing.pages || 'N/A'}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showStatus(msg, type) {
+            const status = document.getElementById('status');
+            status.textContent = msg;
+            status.className = `status show ${type}`;
+        }
+
+        function clearStatus() {
+            document.getElementById('status').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
