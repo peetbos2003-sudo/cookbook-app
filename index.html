@@ -1215,6 +1215,17 @@ async function lookupISBN() {
     const isbn = get('isbnInput').value.trim().replace(/[-\s]/g, '');
     if (!isbn) return;
     setUploadStatus('ISBN wordt opgezocht…', 'processing');
+
+    // Check own collection first
+    const own = state.cookbooks.find(c => c.isbn && c.isbn.replace(/[-\s]/g, '') === isbn);
+    if (own) {
+        get('titleInput').value  = own.title  || '';
+        get('authorInput').value = own.author || '';
+        setUploadStatus(`✓ "${own.title}" gevonden in eigen collectie!`, 'success');
+        setTimeout(clearUploadStatus, 2500);
+        return;
+    }
+
     try {
         // Open Library
         const ol = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`).then(r => r.json());
@@ -1236,7 +1247,7 @@ async function lookupISBN() {
             setTimeout(clearUploadStatus, 2500);
             return;
         }
-        // Not found in any API — show a soft warning, not a blocking error
+        // Not found anywhere
         setUploadStatus('Dit boek staat niet in onze databases. Vul titel en auteur hieronder handmatig in.', 'processing');
     } catch {
         setUploadStatus('Verbindingsfout bij opzoeken — vul gegevens handmatig in.', 'processing');
