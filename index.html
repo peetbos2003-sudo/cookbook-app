@@ -967,8 +967,11 @@ kip 33, 44, 102"></textarea>
 
             <!-- Global ingredient search -->
             <div id="globalSearchBox" class="search-box" style="display:none">
-                <label>Zoek ingrediënt in alle kookboeken</label>
-                <input type="text" id="globalSearch" placeholder="bijv. kip, tomaat, champignon…">
+                <label>Zoek in alle kookboeken — ingrediënten &amp; hoofdstukken</label>
+                <div class="inline-row">
+                    <input type="text" id="globalSearch" placeholder="bijv. soep, kip, bonen, chocolade…">
+                    <button id="globalSearchBtn" class="btn-sm btn-green">Zoek</button>
+                </div>
             </div>
 
             <div id="searchResults"></div>
@@ -1600,11 +1603,10 @@ document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click
     const cat = e.currentTarget.dataset.cat;
 
     if (activeCat === cat) {
-        // Deselect — show all books again
+        // Deselect — collapse results, keep grid visible
         activeCat = null;
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
         get('categoryResults').style.display = 'none';
-        get('cookbookGrid').style.display    = 'grid';
         return;
     }
 
@@ -1617,7 +1619,6 @@ document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click
     const labels   = { voorgerecht: '🥗 Voorgerecht', hoofdgerecht: '🍖 Hoofdgerecht', nagerecht: '🍮 Nagerecht' };
 
     get('catResultsTitle').textContent = `${labels[cat]} — ${hits.length} hoofdstuk${hits.length !== 1 ? 'ken' : ''} gevonden`;
-
     get('catResultsList').innerHTML = hits.length
         ? hits.map(h => `
             <div class="cat-chapter-result" onclick="openCookbook('${h.bookId}')">
@@ -1627,38 +1628,77 @@ document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click
                 </div>
                 ${h.chapter.startPage ? `<span class="cat-chapter-page">p. ${h.chapter.startPage}</span>` : ''}
             </div>`).join('')
-        : `<div class="empty-state"><p>Geen hoofdstukken gevonden voor deze categorie.</p><p>Voeg kookboeken toe met meer foto's voor betere herkenning.</p></div>`;
+        : `<div class="empty-state"><p>Geen hoofdstukken gevonden voor deze categorie.</p><p>Scan inhoudsopgave-foto's om hoofdstukken te herkennen.</p></div>`;
 
     get('categoryResults').style.display = 'block';
-    get('cookbookGrid').style.display    = hits.length ? 'none' : 'grid'; // hide grid when results shown
+    // Cookbook grid stays visible below the results
 }));
 
-// ===== GLOBAL INGREDIENT SEARCH =====
-get('globalSearch').addEventListener('input', e => {
-    const q     = e.target.value.trim().toLowerCase();
+// ===== GLOBAL SEARCH — chapters + ingredients, fuzzy =====
+
+// Normalize a string for fuzzy matching: lowercase, strip accents, collapse spaces
+function normalize(s) {
+    return (s || '').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip accents
+        .replace(/[^a-z0-9\s]/g, ' ')                    // non-alpha → space
+        .replace(/\s+/g, ' ').trim();
+}
+
+// Returns true if every word in the query appears somewhere in the target
+function fuzzyMatch(query, target) {
+    const t = normalize(target);
+    return normalize(query).split(' ').every(word => word.length > 0 && t.includes(word));
+}
+
+function runSearch() {
+    const q     = get('globalSearch').value.trim();
     const resEl = get('searchResults');
     if (!q) { resEl.innerHTML = ''; return; }
 
-    const hits = [];
+    const chapterHits    = [];
+    const ingredientHits = [];
+
     for (const cb of state.cookbooks) {
+        // Search chapters
+        for (const ch of (cb.chapters || [])) {
+            if (fuzzyMatch(q, ch.name)) {
+                chapterHits.push({ name: ch.name, pages: ch.startPage ? String(ch.startPage) : null,
+                                   bookTitle: cb.title, bookId: cb.id, type: 'chapter' });
+            }
+        }
+        // Search ingredients
         for (const ing of (cb.ingredients || [])) {
-            if (ing.name.includes(q)) hits.push({ ...ing, bookTitle: cb.title, bookId: cb.id });
+            if (fuzzyMatch(q, ing.name)) {
+                ingredientHits.push({ ...ing, bookTitle: cb.title, bookId: cb.id, type: 'ingredient' });
+            }
         }
     }
 
-    if (!hits.length) {
-        resEl.innerHTML = `<div class="empty-state"><p>Geen resultaten voor "${esc(q)}"</p></div>`;
+    const total = chapterHits.length + ingredientHits.length;
+    if (!total) {
+        resEl.innerHTML = `<div class="empty-state"><p>Geen resultaten voor "<strong>${esc(q)}</strong>".</p><p>Probeer een ander woord, of scan de inhoudsopgave van meer kookboeken.</p></div>`;
         return;
     }
 
-    const shown = hits.slice(0, 60);
-    resEl.innerHTML = shown.map(h => `
+    const renderHit = (h) => `
         <div class="search-result" onclick="openCookbook('${h.bookId}')">
-            <div class="search-result-name">${esc(h.name)}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;background:${h.type==='chapter'?'var(--olive-green)':'var(--warm-orange)'};color:white;border-radius:4px;padding:2px 6px;font-weight:700;flex-shrink:0">
+                    ${h.type === 'chapter' ? 'hfst' : 'ingr'}
+                </span>
+                <span class="search-result-name">${esc(h.name)}</span>
+            </div>
             <div class="search-result-meta">${esc(h.bookTitle)} · p. ${h.pages || '?'}</div>
-        </div>`).join('')
-        + (hits.length > 60 ? `<p style="font-size:12px;text-align:center;color:var(--warm-orange);padding:0.5rem">+${hits.length - 60} meer. Zoek specifieker.</p>` : '');
-});
+        </div>`;
+
+    const all   = [...chapterHits, ...ingredientHits].slice(0, 80);
+    const extra = total > 80 ? `<p style="font-size:12px;text-align:center;color:var(--warm-orange);padding:0.5rem">+${total-80} meer — zoek specifieker.</p>` : '';
+
+    resEl.innerHTML = all.map(renderHit).join('') + extra;
+}
+
+get('globalSearch')   .addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+get('globalSearchBtn').addEventListener('click', runSearch);
 
 // ===== COOKBOOK DETAIL MODAL =====
 window.openCookbook = function(id) {
