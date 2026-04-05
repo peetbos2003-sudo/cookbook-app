@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Parklaankookboeken — gedeelde kookboek index voor de familie">
-    <meta name="theme-color" content="#faf8f3">
+    <meta name="theme-color" content="#d97956">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Kookboeken">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
     <title>Parklaankookboeken</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -854,6 +859,18 @@
                     <label>Auteur (optioneel)</label>
                     <input type="text" id="authorInput" placeholder="bijv. Beverley Le Blanc">
                 </div>
+                <div class="form-group">
+                    <label>Cover foto (optioneel)</label>
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div id="coverPreviewWrap" style="width:60px;height:80px;border-radius:6px;overflow:hidden;background:var(--light-tan);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📖</div>
+                        <div>
+                            <button type="button" id="coverUploadBtn" class="btn-sm btn-outline">📷 Foto kiezen</button>
+                            <button type="button" id="coverClearBtn" class="btn-sm" style="display:none;margin-top:4px;color:var(--burnt-orange)">Verwijderen</button>
+                            <input type="file" id="coverFileInput" accept="image/*" style="display:none">
+                            <div style="font-size:11px;color:#999;margin-top:4px">Foto van de voorkant van het boek</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Step 2: Photos -->
@@ -1254,6 +1271,40 @@ async function lookupISBN() {
     }
 }
 
+// ===== COVER UPLOAD =====
+get('coverUploadBtn').addEventListener('click', () => get('coverFileInput').click());
+get('coverFileInput').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const dataUrl = await resizeCover(file, 200, 280);
+    state.coverData = dataUrl;
+    get('coverPreviewWrap').innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover">`;
+    get('coverClearBtn').style.display = 'block';
+    get('coverUploadBtn').textContent = '📷 Foto wijzigen';
+    e.target.value = '';
+});
+get('coverClearBtn').addEventListener('click', () => {
+    state.coverData = null;
+    get('coverPreviewWrap').innerHTML = '📖';
+    get('coverClearBtn').style.display = 'none';
+    get('coverUploadBtn').textContent = '📷 Foto kiezen';
+});
+
+function resizeCover(file, maxW, maxH) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+            const c = document.createElement('canvas');
+            c.width  = Math.round(img.width  * scale);
+            c.height = Math.round(img.height * scale);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            resolve(c.toDataURL('image/jpeg', 0.75));
+        };
+        img.src = URL.createObjectURL(file);
+    });
+}
+
 // ===== FILE SELECTION =====
 get('cameraBtn') .addEventListener('click', () => get('cameraInput').click());
 get('galleryBtn').addEventListener('click', () => get('fileInput').click());
@@ -1420,16 +1471,15 @@ async function saveCookbook() {
     const chapters    = extractChapters(get('tocText').value);
     const ingredients = extractIngredients(get('ingText').value);
 
-    // Fetch cover: try Google Books, fall back to Open Library
+    // Fetch cover URL from APIs only if no manual cover was uploaded
     let coverImageUrl = null;
-    if (isbn) {
+    if (!state.coverData && isbn) {
         try {
             const gb = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`).then(r => r.json());
             const links = gb.items?.[0]?.volumeInfo?.imageLinks;
             const thumb = links?.thumbnail || links?.smallThumbnail;
             if (thumb) coverImageUrl = thumb.replace('http://', 'https://');
         } catch { /* try next */ }
-        // Open Library covers — stored as fallback, validity checked at display time
         if (!coverImageUrl) {
             coverImageUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
         }
@@ -1438,7 +1488,8 @@ async function saveCookbook() {
     setUploadStatus('Opslaan…', 'processing');
     try {
         const data = {
-            title, author: author || null, isbn: isbn || null, coverImageUrl,
+            title, author: author || null, isbn: isbn || null,
+            coverData: state.coverData || null, coverImageUrl,
             chapters, ingredients,
             ocrConfidence: { toc: state.ocr.toc.confidence, ing: state.ocr.ing.confidence },
             updatedAt: new Date(),
@@ -1479,6 +1530,10 @@ function resetUpload() {
     get('step1Title').textContent = 'Stap 1 — Kookboek informatie';
     state.pendingFiles  = [];
     state.editingBookId = null;
+    state.coverData     = null;
+    get('coverPreviewWrap').innerHTML = '📖';
+    get('coverClearBtn').style.display = 'none';
+    get('coverUploadBtn').textContent = '📷 Foto kiezen';
 }
 
 // ===== OCR EXTRACTION =====
@@ -1607,7 +1662,7 @@ function renderBrowse() {
     });
 
     grid.innerHTML = state.cookbooks.map(cb => {
-        const coverSrc = cb.coverImageUrl || (cb.isbn ? `https://covers.openlibrary.org/b/isbn/${esc(cb.isbn)}-M.jpg` : null);
+        const coverSrc = cb.coverData || cb.coverImageUrl || (cb.isbn ? `https://covers.openlibrary.org/b/isbn/${esc(cb.isbn)}-M.jpg` : null);
         const cover = coverSrc
             ? `<div class="cookbook-cover">${coverImg(coverSrc)}</div>`
             : `<div class="cookbook-cover">📖</div>`;
@@ -1763,7 +1818,7 @@ window.openCookbook = function(id) {
     get('modalAddedBy').textContent = cb.addedBy ? `Toegevoegd door ${cb.addedBy}` : '';
 
     const coverEl = get('modalCover');
-    const coverSrc = cb.coverImageUrl || (cb.isbn ? `https://covers.openlibrary.org/b/isbn/${esc(cb.isbn)}-M.jpg` : null);
+    const coverSrc = cb.coverData || cb.coverImageUrl || (cb.isbn ? `https://covers.openlibrary.org/b/isbn/${esc(cb.isbn)}-M.jpg` : null);
     coverEl.innerHTML = coverSrc ? coverImg(coverSrc) : '📖';
 
     get('editTitle') .value = cb.title;
