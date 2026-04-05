@@ -435,23 +435,74 @@
         .photo-size  { font-size: 11px; color: var(--warm-orange); }
 
         /* ===== BROWSE STATS ===== */
-        .browse-stats {
+        /* ===== CATEGORY FILTERS ===== */
+        .category-filters {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 1.5rem;
         }
 
-        .stat-card {
+        .cat-btn {
             background: var(--light-tan);
-            border: 2px solid var(--olive-green);
+            border: 2px solid var(--sage-green);
             border-radius: 12px;
-            padding: 1.1rem;
+            padding: 1rem 0.5rem;
             text-align: center;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark-brown);
+            box-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .cat-btn .cat-icon { display: block; font-size: 22px; margin-bottom: 5px; }
+        .cat-btn .cat-count { display: block; font-size: 10px; font-weight: 600; color: var(--warm-orange); margin-top: 3px; }
+        .cat-btn:hover  { border-color: var(--warm-orange); color: var(--warm-orange); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(217,121,86,0.15); }
+        .cat-btn.active { background: linear-gradient(135deg, var(--olive-green), var(--sage-green)); color: white; border-color: var(--olive-green); box-shadow: 0 4px 12px rgba(107,142,95,0.25); }
+        .cat-btn.active:hover { color: white; }
+        .cat-btn.active .cat-count { color: rgba(255,255,255,0.8); }
+        .cat-btn:active { transform: translateY(0); }
+
+        .cat-results-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--olive-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
         }
 
-        .stat-number { display: block; font-size: 28px; font-weight: 700; color: var(--warm-orange); }
-        .stat-label  { font-size: 10px; color: var(--olive-green); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .cat-chapter-result {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 13px;
+            background: var(--cream);
+            border: 1px solid var(--sage-green);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            font-size: 13px;
+        }
+        .cat-chapter-result:hover { border-color: var(--warm-orange); }
+        .cat-chapter-book  { font-size: 11px; color: var(--accent-gold); font-style: italic; margin-top: 2px; }
+        .cat-chapter-page  { font-size: 12px; color: var(--warm-orange); font-weight: 600; flex-shrink: 0; margin-left: 10px; }
+
+        /* skip photos link */
+        .skip-link {
+            text-align: center;
+            border-top: 1px dashed var(--sage-green);
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-size: 12px;
+            color: var(--dark-brown);
+        }
 
         /* ===== COOKBOOK GRID ===== */
         .cookbook-grid {
@@ -684,9 +735,9 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 560px) {
-            .cookbook-grid { grid-template-columns: repeat(2, 1fr); }
-            .browse-stats  { grid-template-columns: repeat(3, 1fr); }
-            .review-actions { grid-template-columns: 1fr; }
+            .cookbook-grid    { grid-template-columns: repeat(2, 1fr); }
+            .category-filters { grid-template-columns: repeat(3, 1fr); }
+            .review-actions   { grid-template-columns: 1fr; }
             .modal-overlay { padding: 0; align-items: flex-end; }
             .modal { margin: 0; border-radius: 20px 20px 0 0; }
             .modal-header { flex-direction: column; }
@@ -824,6 +875,11 @@
                     <div id="photoList"></div>
                     <button id="processBtn" style="margin-top:1rem">Verwerken met OCR →</button>
                 </div>
+
+                <div class="skip-link">
+                    Nog geen foto's bij de hand?
+                    <button class="btn-link" id="skipPhotosBtn">Boek nu opslaan, foto's later toevoegen →</button>
+                </div>
             </div>
 
             <!-- Step 3: OCR progress -->
@@ -883,21 +939,33 @@ kip 33, 44, 102"></textarea>
 
         <!-- ===== BROWSE TAB ===== -->
         <div id="tabBrowse" class="tab-content">
-            <div id="browseStats" class="browse-stats" style="display:none">
-                <div class="stat-card">
-                    <span class="stat-number" id="statBooks">0</span>
-                    <span class="stat-label">Kookboeken</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="statChapters">0</span>
-                    <span class="stat-label">Hoofdstukken</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="statIngredients">0</span>
-                    <span class="stat-label">Ingrediënten</span>
-                </div>
+
+            <!-- Category filter buttons -->
+            <div id="categoryFilters" class="category-filters" style="display:none">
+                <button class="cat-btn" data-cat="voorgerecht">
+                    <span class="cat-icon">🥗</span>
+                    Voorgerecht
+                    <span class="cat-count" id="catCountVoorgerecht"></span>
+                </button>
+                <button class="cat-btn" data-cat="hoofdgerecht">
+                    <span class="cat-icon">🍖</span>
+                    Hoofdgerecht
+                    <span class="cat-count" id="catCountHoofdgerecht"></span>
+                </button>
+                <button class="cat-btn" data-cat="nagerecht">
+                    <span class="cat-icon">🍮</span>
+                    Nagerecht
+                    <span class="cat-count" id="catCountNagerecht"></span>
+                </button>
             </div>
 
+            <!-- Category results (shown when a category is active) -->
+            <div id="categoryResults" style="display:none;margin-bottom:1.5rem">
+                <div class="cat-results-title" id="catResultsTitle"></div>
+                <div id="catResultsList"></div>
+            </div>
+
+            <!-- Global ingredient search -->
             <div id="globalSearchBox" class="search-box" style="display:none">
                 <label>Zoek ingrediënt in alle kookboeken</label>
                 <input type="text" id="globalSearch" placeholder="bijv. kip, tomaat, champignon…">
@@ -1172,7 +1240,21 @@ function renderPhotoPreview() {
     get('photoPreview').style.display = 'block';
 }
 
-get('processBtn').addEventListener('click', startOCR);
+get('processBtn')   .addEventListener('click', startOCR);
+get('skipPhotosBtn').addEventListener('click', () => {
+    const title = get('titleInput').value.trim();
+    if (!title) { setUploadStatus('Voer eerst een kookboektitel in (Stap 1)', 'error'); return; }
+    // Go straight to the review editor with empty text — user can fill manually or save right away
+    get('step1').style.display = 'none';
+    get('step2').style.display = 'none';
+    state.ocr = { toc: { text: '', confidence: 0 }, ing: { text: '', confidence: 0 } };
+    showReview();
+    get('step4').style.display = 'block';
+    get('tocConfidence').textContent = 'Geen foto — u kunt hoofdstukken handmatig invullen of leeg laten.';
+    get('tocConfidence').style.color = 'var(--accent-gold)';
+    get('ingConfidence').textContent = 'Geen foto — u kunt ingrediënten later toevoegen via "Foto\'s toevoegen".';
+    get('ingConfidence').style.color = 'var(--accent-gold)';
+});
 
 // ===== OCR =====
 async function startOCR() {
@@ -1452,36 +1534,41 @@ function loadCookbooks() {
 }
 
 // ===== BROWSE =====
+const CATEGORY_KEYWORDS = {
+    voorgerecht : ['voorgerecht', 'soep', 'amuse', 'hapje', 'hapjes', 'salade', 'salades', 'entrée', 'starter', 'antipasti', 'brood', 'garnaal', 'toast', 'aperitif'],
+    hoofdgerecht: ['hoofdgerecht', 'vlees', 'vis', 'gevogelte', 'pasta', 'rijst', 'kip', 'rundvlees', 'lamsvlees', 'varken', 'wild', 'zeevruchten', 'tajine', 'curry', 'stoofpot', 'roerbak', 'groente'],
+    nagerecht   : ['nagerecht', 'dessert', 'gebak', 'taart', 'ijs', 'cake', 'koek', 'pudding', 'mousse', 'chocolade', 'bakken', 'zoet', 'fruit', 'sorbet'],
+};
+
 function renderBrowse() {
     const grid  = get('cookbookGrid');
     const empty = get('browseEmpty');
-    const stats = get('browseStats');
+    const cats  = get('categoryFilters');
     const sb    = get('globalSearchBox');
 
     if (!state.cookbooks.length) {
         grid.innerHTML = '';
         empty.style.display = 'block';
-        stats.style.display = sb.style.display = 'none';
+        cats.style.display  = sb.style.display = 'none';
         return;
     }
 
     empty.style.display = 'none';
-    stats.style.display = 'grid';
+    cats.style.display  = 'grid';
     sb.style.display    = 'block';
 
-    const totalChapters    = state.cookbooks.reduce((s, cb) => s + (cb.chapters?.length    || 0), 0);
-    const totalIngredients = state.cookbooks.reduce((s, cb) => s + (cb.ingredients?.length || 0), 0);
-
-    get('statBooks')      .textContent = state.cookbooks.length;
-    get('statChapters')   .textContent = totalChapters;
-    get('statIngredients').textContent = totalIngredients;
+    // Update category counts
+    Object.entries(CATEGORY_KEYWORDS).forEach(([cat, keywords]) => {
+        const count = getChaptersForCategory(keywords).length;
+        const el = get(`catCount${cat.charAt(0).toUpperCase() + cat.slice(1)}`);
+        if (el) el.textContent = count > 0 ? `${count} hoofdstukken` : '';
+    });
 
     grid.innerHTML = state.cookbooks.map(cb => {
-        const cover = cb.coverImageUrl
-            ? `<div class="cookbook-cover">${coverImg(cb.coverImageUrl)}</div>`
-            : cb.isbn
-              ? `<div class="cookbook-cover">${coverImg('https://covers.openlibrary.org/b/isbn/'+esc(cb.isbn)+'-M.jpg')}</div>`
-              : `<div class="cookbook-cover">📖</div>`;
+        const coverSrc = cb.coverImageUrl || (cb.isbn ? `https://covers.openlibrary.org/b/isbn/${esc(cb.isbn)}-M.jpg` : null);
+        const cover = coverSrc
+            ? `<div class="cookbook-cover">${coverImg(coverSrc)}</div>`
+            : `<div class="cookbook-cover">📖</div>`;
         return `<div class="cookbook-card" onclick="openCookbook('${cb.id}')">
             ${cover}
             <div class="cookbook-card-body">
@@ -1492,6 +1579,59 @@ function renderBrowse() {
         </div>`;
     }).join('');
 }
+
+function getChaptersForCategory(keywords) {
+    const results = [];
+    for (const cb of state.cookbooks) {
+        for (const ch of (cb.chapters || [])) {
+            const name = ch.name.toLowerCase();
+            if (keywords.some(kw => name.includes(kw))) {
+                results.push({ chapter: ch, bookTitle: cb.title, bookId: cb.id });
+            }
+        }
+    }
+    return results;
+}
+
+// ===== CATEGORY FILTERS =====
+let activeCat = null;
+
+document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click', e => {
+    const cat = e.currentTarget.dataset.cat;
+
+    if (activeCat === cat) {
+        // Deselect — show all books again
+        activeCat = null;
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        get('categoryResults').style.display = 'none';
+        get('cookbookGrid').style.display    = 'grid';
+        return;
+    }
+
+    activeCat = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+
+    const keywords = CATEGORY_KEYWORDS[cat];
+    const hits     = getChaptersForCategory(keywords);
+    const labels   = { voorgerecht: '🥗 Voorgerecht', hoofdgerecht: '🍖 Hoofdgerecht', nagerecht: '🍮 Nagerecht' };
+
+    get('catResultsTitle').textContent = `${labels[cat]} — ${hits.length} hoofdstuk${hits.length !== 1 ? 'ken' : ''} gevonden`;
+
+    get('catResultsList').innerHTML = hits.length
+        ? hits.map(h => `
+            <div class="cat-chapter-result" onclick="openCookbook('${h.bookId}')">
+                <div>
+                    <div>${esc(h.chapter.name)}</div>
+                    <div class="cat-chapter-book">${esc(h.bookTitle)}</div>
+                </div>
+                ${h.chapter.startPage ? `<span class="cat-chapter-page">p. ${h.chapter.startPage}</span>` : ''}
+            </div>`).join('')
+        : `<div class="empty-state"><p>Geen hoofdstukken gevonden voor deze categorie.</p><p>Voeg kookboeken toe met meer foto's voor betere herkenning.</p></div>`;
+
+    get('categoryResults').style.display = 'block';
+    get('cookbookGrid').style.display    = hits.length ? 'none' : 'grid'; // hide grid when results shown
+}));
 
 // ===== GLOBAL INGREDIENT SEARCH =====
 get('globalSearch').addEventListener('input', e => {
