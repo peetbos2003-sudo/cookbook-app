@@ -1031,15 +1031,19 @@
             }
 
             const file = files[index];
-            const fileType = index === 0 ? 'table of contents' : 'ingredient index';
+            const fileType = index === 0 ? 'inhoudsopgave' : 'ingrediëntenindex';
             
-            showStatus(`Processing ${fileType}...`, 'processing');
+            showStatus(`${fileType.toUpperCase()} wordt verwerkt...`, 'processing');
 
             try {
                 const reader = new FileReader();
                 reader.onload = async (e) => {
                     const result = await Tesseract.recognize(e.target.result, 'eng');
                     const text = result.data.text;
+                    
+                    console.log(`=== OCR OUTPUT FOR ${fileType.toUpperCase()} ===`);
+                    console.log(text);
+                    console.log(`=== END OCR OUTPUT ===`);
 
                     if (index === 0) {
                         await processCookbook(cbName, files, index + 1, isbn);
@@ -1047,6 +1051,9 @@
                         // Save to Firebase
                         const chapters = extractChapters(text);
                         const ingredients = extractIngredients(text);
+                        
+                        console.log('Extracted chapters:', chapters);
+                        console.log('Extracted ingredients:', ingredients);
                         
                         await addDoc(collection(db, 'cookbooks'), {
                             userId: appState.user.uid,
@@ -1063,6 +1070,7 @@
                 };
                 reader.readAsDataURL(file);
             } catch (err) {
+                console.error('Error processing image:', err);
                 showStatus('Fout bij verwerken van afbeelding', 'error');
             }
         }
