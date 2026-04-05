@@ -1655,6 +1655,18 @@ function runSearch() {
     const resEl = get('searchResults');
     if (!q) { resEl.innerHTML = ''; return; }
 
+    // DEBUG: show what's actually stored
+    console.group('🔍 Search debug for:', q);
+    console.log('Total books in state:', state.cookbooks.length);
+    state.cookbooks.forEach(cb => {
+        console.log(`📖 "${cb.title}"`,
+            '| chapters:', cb.chapters?.length ?? 'undefined',
+            '| ingredients:', cb.ingredients?.length ?? 'undefined');
+        if (cb.chapters?.length) console.log('  chapters sample:', cb.chapters.slice(0,3));
+        if (cb.ingredients?.length) console.log('  ingredients sample:', cb.ingredients.slice(0,3));
+    });
+    console.groupEnd();
+
     const chapterHits    = [];
     const ingredientHits = [];
 
