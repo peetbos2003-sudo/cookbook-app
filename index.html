@@ -1333,23 +1333,34 @@ function extractChapters(text) {
     if (!text?.trim()) return [];
     const chapters = [];
 
-    for (const rawLine of text.split('\n')) {
-        const line = rawLine.trim();
-        if (!line || line.length < 3 || line.length > 100) continue;
+    for (let rawLine of text.split('\n')) {
+        // Strip trailing OCR junk: |, ], ), whitespace
+        let line = rawLine.trim().replace(/[\|\]\)\s]+$/, '').trim();
+        if (!line || line.length < 3 || line.length > 120) continue;
         if (/^\d+$/.test(line)) continue;
 
-        // Pattern A: "Title text   42" or "Title text.....42"
-        const matchA = line.match(/^(.+?)[\s.]{1,}(\d{1,3})\s*$/);
-        if (matchA) {
-            const name = matchA[1].replace(/[.\s]+$/, '').trim();
-            const page = parseInt(matchA[2]);
-            if (name.length >= 3 && !/^\d/.test(name)) {
-                chapters.push({ name, startPage: page });
-            }
-        }
+        // Find a page number at the end — allow OCR noise like "3)" or "3]" for "39"
+        const m = line.match(/^(.+?)\s+(\d{1,3}[\)\]]?)\s*$/);
+        if (!m) continue;
+
+        let name    = m[1].trim();
+        let pageStr = m[2].replace(/[)\]]/g, ''); // strip closing brackets OCR added
+        const page  = parseInt(pageStr);
+        if (isNaN(page) || page < 1) continue;
+
+        // Strip leading single-char OCR noise: "f tajines…" → "tajines…"
+        name = name.replace(/^[a-zA-Z]\s+(?=[a-z])/, '').trim();
+        // Strip leading symbol noise: "— ", "| ", "= ", etc.
+        name = name.replace(/^[-=~*#|BE]+\s*/, '').trim();
+        // Strip trailing dots/spaces
+        name = name.replace(/[.\s]+$/, '').trim();
+
+        if (name.length < 3 || /^\d/.test(name)) continue;
+
+        chapters.push({ name, startPage: page });
     }
 
-    // Pattern B: two-line format (name on one line, page on next)
+    // Fallback — two-line format: chapter name on one line, bare page number on next
     if (chapters.length === 0) {
         const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
         for (let i = 0; i < lines.length - 1; i++) {
