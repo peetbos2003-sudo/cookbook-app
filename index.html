@@ -1000,15 +1000,13 @@ kip 33, 44, 102"></textarea>
         <div style="padding:1rem;background:var(--cream)">
             <div style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:3/4">
                 <video id="scannerVideo" style="width:100%;height:100%;object-fit:cover" playsinline muted></video>
-                <canvas id="scannerCanvas" style="display:none;width:100%;height:100%;object-fit:cover"></canvas>
                 <!-- Aiming reticle -->
-                <div id="scannerReticle" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
                     <div style="width:75%;height:30%;border:2px solid var(--warm-orange);border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,0.35)"></div>
                 </div>
             </div>
-            <button id="scannerSnapBtn" class="btn-green" style="width:100%;margin-top:0.75rem;font-size:15px">📸 Foto nemen</button>
-            <div id="scannerStatus" class="status processing show" style="margin-top:0.75rem">
-                <span class="spinner"></span> Camera starten…
+            <div id="scannerStatus" class="status processing show" style="margin-top:1rem">
+                <span class="spinner"></span> Barcode zoeken…
             </div>
         </div>
     </div>
@@ -1925,66 +1923,29 @@ function switchTab(id) {
 }
 
 // ===== BARCODE SCANNER =====
-let scannerStream = null;
+let scannerReader = null;
 
 get('isbnScanBtn').addEventListener('click', async () => {
     get('scannerOverlay').classList.add('show');
     get('scannerStatus').className = 'status processing show';
     get('scannerStatus').innerHTML = '<span class="spinner"></span> Camera starten…';
-    get('scannerSnapBtn').disabled = true;
-
-    const video = get('scannerVideo');
-    const canvas = get('scannerCanvas');
-    canvas.style.display = 'none';
-    video.style.display = 'block';
-    get('scannerReticle').style.display = 'flex';
-
     try {
-        scannerStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+        scannerReader = codeReader;
+        await codeReader.decodeFromVideoDevice(null, 'scannerVideo', (result, err) => {
+            if (result) {
+                closeScanner();
+                get('isbnInput').value = result.getText();
+                lookupISBN();
+            }
+            if (err && !(err instanceof ZXing.NotFoundException)) {
+                console.warn('Scanner error:', err);
+            }
         });
-        video.srcObject = scannerStream;
-        await video.play();
-        get('scannerStatus').className = 'status success show';
-        get('scannerStatus').textContent = 'Richt op de barcode en neem een foto.';
-        get('scannerSnapBtn').disabled = false;
+        get('scannerStatus').innerHTML = '<span class="spinner"></span> Barcode zoeken…';
     } catch(e) {
         get('scannerStatus').className = 'status error show';
         get('scannerStatus').textContent = 'Camera niet beschikbaar: ' + e.message;
-    }
-});
-
-get('scannerSnapBtn').addEventListener('click', async () => {
-    const video  = get('scannerVideo');
-    const canvas = get('scannerCanvas');
-
-    // Capture frame
-    canvas.width  = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-
-    // Show frozen frame, hide live video
-    video.style.display  = 'none';
-    canvas.style.display = 'block';
-    get('scannerReticle').style.display = 'none';
-    get('scannerSnapBtn').disabled = true;
-    get('scannerStatus').className = 'status processing show';
-    get('scannerStatus').innerHTML = '<span class="spinner"></span> Barcode zoeken…';
-
-    try {
-        const codeReader = new ZXing.BrowserMultiFormatReader();
-        const result = await codeReader.decodeFromCanvas(canvas);
-        closeScanner();
-        get('isbnInput').value = result.getText();
-        lookupISBN();
-    } catch(e) {
-        // Not found — let user try again with live preview
-        get('scannerStatus').className = 'status error show';
-        get('scannerStatus').textContent = 'Geen barcode gevonden. Probeer opnieuw.';
-        video.style.display  = 'block';
-        canvas.style.display = 'none';
-        get('scannerReticle').style.display = 'flex';
-        get('scannerSnapBtn').disabled = false;
     }
 });
 
@@ -1994,8 +1955,7 @@ get('scannerOverlay').addEventListener('click', e => {
 });
 
 function closeScanner() {
-    if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
-    get('scannerVideo').srcObject = null;
+    if (scannerReader) { scannerReader.reset(); scannerReader = null; }
     get('scannerOverlay').classList.remove('show');
 }
 </script>
