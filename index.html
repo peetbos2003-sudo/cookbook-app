@@ -785,7 +785,7 @@
 
             <!-- Step 1: Book info -->
             <div id="step1" class="card">
-                <div class="card-title">Stap 1 — Kookboek informatie</div>
+                <div class="card-title" id="step1Title">Stap 1 — Kookboek informatie</div>
 
                 <div class="form-group">
                     <label>ISBN-nummer (optioneel)</label>
@@ -968,7 +968,16 @@ kip 33, 44, 102"></textarea>
                     <input type="text" id="editIsbn">
                 </div>
                 <button id="saveEditBtn" class="btn-green" style="margin-bottom:0.75rem">Wijzigingen opslaan</button>
+
                 <div style="border-top:1px solid var(--light-tan);padding-top:1rem;margin-top:0.5rem">
+                    <div class="card-title" style="margin-bottom:0.4rem">Foto's verwerken</div>
+                    <p style="font-size:12px;color:var(--dark-brown);margin-bottom:0.75rem;font-style:italic">
+                        Scan nieuwe foto's om de hoofdstukken en ingrediënten te vervangen of aan te vullen.
+                    </p>
+                    <button id="rescanBtn" class="btn-outline">📷 Foto's toevoegen / opnieuw scannen</button>
+                </div>
+
+                <div style="border-top:1px solid var(--light-tan);padding-top:1rem;margin-top:1rem">
                     <button id="deleteBookBtn" class="btn-danger">🗑 Kookboek verwijderen</button>
                 </div>
             </div>
@@ -1012,6 +1021,7 @@ const state = {
     pendingFiles: [],
     ocr: { toc: { text: '', confidence: 0 }, ing: { text: '', confidence: 0 } },
     activeCookbook: null,
+    editingBookId: null,
 };
 
 // ===== AUTH SCREENS =====
@@ -1127,9 +1137,10 @@ async function lookupISBN() {
             setTimeout(clearUploadStatus, 2500);
             return;
         }
-        setUploadStatus('ISBN niet gevonden. Vul gegevens handmatig in.', 'error');
+        // Not found in any API — show a soft warning, not a blocking error
+        setUploadStatus('Dit boek staat niet in onze databases. Vul titel en auteur hieronder handmatig in.', 'processing');
     } catch {
-        setUploadStatus('Fout bij opzoeken. Controleer uw internetverbinding.', 'error');
+        setUploadStatus('Verbindingsfout bij opzoeken — vul gegevens handmatig in.', 'processing');
     }
 }
 
@@ -1285,33 +1296,49 @@ async function saveCookbook() {
     const chapters    = extractChapters(get('tocText').value);
     const ingredients = extractIngredients(get('ingText').value);
 
-    // Fetch cover from Google Books
+    // Fetch cover: try Google Books, fall back to Open Library
     let coverImageUrl = null;
     if (isbn) {
         try {
             const gb = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`).then(r => r.json());
-            const thumb = gb.items?.[0]?.volumeInfo?.imageLinks?.thumbnail;
+            const links = gb.items?.[0]?.volumeInfo?.imageLinks;
+            const thumb = links?.thumbnail || links?.smallThumbnail;
             if (thumb) coverImageUrl = thumb.replace('http://', 'https://');
-        } catch { /* no cover */ }
+        } catch { /* try next */ }
+        // Open Library covers — stored as fallback, validity checked at display time
+        if (!coverImageUrl) {
+            coverImageUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
+        }
     }
 
     setUploadStatus('Opslaan…', 'processing');
     try {
-        await addDoc(collection(db, 'cookbooks'), {
-            userId     : state.user.uid,
-            addedBy    : state.user.displayName || state.user.email.split('@')[0],
+        const data = {
             title, author: author || null, isbn: isbn || null, coverImageUrl,
             chapters, ingredients,
             ocrConfidence: { toc: state.ocr.toc.confidence, ing: state.ocr.ing.confidence },
-            createdAt: new Date(),
             updatedAt: new Date(),
-        });
-        setUploadStatus(`✓ "${title}" toegevoegd aan de bibliotheek!`, 'success');
+        };
+
+        if (state.editingBookId) {
+            // Updating an existing book
+            const { updateDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+            await updateDoc(doc(db, 'cookbooks', state.editingBookId), data);
+            setUploadStatus(`✓ "${title}" bijgewerkt!`, 'success');
+        } else {
+            // Adding a new book
+            await addDoc(collection(db, 'cookbooks'), {
+                ...data,
+                userId  : state.user.uid,
+                addedBy : state.user.displayName || state.user.email.split('@')[0],
+                createdAt: new Date(),
+            });
+            setUploadStatus(`✓ "${title}" toegevoegd aan de bibliotheek!`, 'success');
+        }
+
+        state.editingBookId = null;
         resetUpload();
-        setTimeout(() => {
-            switchTab('tabBrowse');
-            clearUploadStatus();
-        }, 1200);
+        setTimeout(() => { switchTab('tabBrowse'); clearUploadStatus(); }, 1200);
     } catch (e) {
         setUploadStatus('Fout bij opslaan: ' + e.message, 'error');
     }
@@ -1325,7 +1352,9 @@ function resetUpload() {
     ['tocPreview','ingPreview'].forEach(id => get(id).style.display = 'none');
     ['tocText','ingText','titleInput','authorInput','isbnInput'].forEach(id => get(id).value = '');
     get('cameraInput').value = get('fileInput').value = '';
-    state.pendingFiles = [];
+    get('step1Title').textContent = 'Stap 1 — Kookboek informatie';
+    state.pendingFiles  = [];
+    state.editingBookId = null;
 }
 
 // ===== OCR EXTRACTION =====
@@ -1449,8 +1478,10 @@ function renderBrowse() {
 
     grid.innerHTML = state.cookbooks.map(cb => {
         const cover = cb.coverImageUrl
-            ? `<div class="cookbook-cover"><img src="${esc(cb.coverImageUrl)}" alt="" onerror="this.parentElement.innerHTML='📖'"></div>`
-            : `<div class="cookbook-cover">📖</div>`;
+            ? `<div class="cookbook-cover">${coverImg(cb.coverImageUrl)}</div>`
+            : cb.isbn
+              ? `<div class="cookbook-cover">${coverImg('https://covers.openlibrary.org/b/isbn/'+esc(cb.isbn)+'-M.jpg')}</div>`
+              : `<div class="cookbook-cover">📖</div>`;
         return `<div class="cookbook-card" onclick="openCookbook('${cb.id}')">
             ${cover}
             <div class="cookbook-card-body">
@@ -1501,9 +1532,8 @@ window.openCookbook = function(id) {
     get('modalAddedBy').textContent = cb.addedBy ? `Toegevoegd door ${cb.addedBy}` : '';
 
     const coverEl = get('modalCover');
-    coverEl.innerHTML = cb.coverImageUrl
-        ? `<img src="${esc(cb.coverImageUrl)}" alt="" onerror="this.innerHTML='📖'">`
-        : '📖';
+    const coverSrc = cb.coverImageUrl || (cb.isbn ? `https://covers.openlibrary.org/b/isbn/${esc(cb.isbn)}-M.jpg` : null);
+    coverEl.innerHTML = coverSrc ? coverImg(coverSrc) : '📖';
 
     get('editTitle') .value = cb.title;
     get('editAuthor').value = cb.author || '';
@@ -1627,10 +1657,31 @@ get('deleteBookBtn').addEventListener('click', async () => {
     } catch (e) { alert('Fout bij verwijderen: ' + e.message); }
 });
 
+get('rescanBtn').addEventListener('click', () => {
+    const cb = state.activeCookbook;
+    closeModal();
+    // Pre-fill upload form with existing book data
+    get('titleInput').value  = cb.title;
+    get('authorInput').value = cb.author || '';
+    get('isbnInput').value   = cb.isbn   || '';
+    get('step1Title').textContent = `Stap 1 — "${cb.title}" bijwerken`;
+    state.editingBookId = cb.id;
+    switchTab('tabUpload');
+    // Scroll to top so user sees the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
 // ===== UTILITIES =====
-function get(id)             { return document.getElementById(id); }
-function pause(ms)           { return new Promise(r => setTimeout(r, ms)); }
-function esc(s)              { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function get(id)  { return document.getElementById(id); }
+function pause(ms){ return new Promise(r => setTimeout(r, ms)); }
+function esc(s)   { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Render a cover <img> that falls back to 📖 if the image is missing or a 1×1 placeholder
+function coverImg(src) {
+    return `<img src="${src}" alt=""
+        onload="if(this.naturalWidth<10||this.naturalHeight<10){this.parentElement.innerHTML='📖'}"
+        onerror="this.parentElement.innerHTML='📖'">`;
+}
 
 function setStatus(el, msg, type) {
     el.textContent = msg;
