@@ -992,15 +992,15 @@ kip 33, 44, 102"></textarea>
     <div class="modal" style="max-width:420px">
         <div class="modal-header" style="justify-content:space-between;align-items:center">
             <div class="modal-info">
-                <h2 style="font-size:16px">📷 Scan ISBN barcode</h2>
-                <div class="modal-author">Richt de camera op de barcode op de achterkant van het boek</div>
+                <h2 style="font-size:16px">📷 Scan ISBN-nummer</h2>
+                <div class="modal-author">Richt de camera op het gedrukte ISBN-nummer</div>
             </div>
             <button class="modal-close" id="scannerCloseBtn" style="width:30px;height:30px">×</button>
         </div>
         <div style="padding:1rem;background:var(--cream)">
             <div style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:3/4">
-                <video id="scannerVideo" style="width:100%;height:100%;object-fit:cover" playsinline muted></video>
-                <canvas id="scannerCanvas" style="display:none;width:100%;height:100%;object-fit:cover"></canvas>
+                <video id="scannerVideo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" playsinline muted></video>
+                <canvas id="scannerCanvas" style="display:none;position:absolute;inset:0;width:100%;height:100%"></canvas>
                 <!-- Aiming reticle: narrow horizontal strip for ISBN digits -->
                 <div id="scannerReticle" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
                     <div style="width:85%;height:12%;border:2px solid var(--warm-orange);border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,0.45)"></div>
@@ -1956,10 +1956,12 @@ get('scannerSnapBtn').addEventListener('click', async () => {
     const video  = get('scannerVideo');
     const canvas = get('scannerCanvas');
 
-    // Freeze frame
+    // Capture full frame at video's native resolution
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0);
+
+    // Show frozen frame, hide live video
     video.style.display  = 'none';
     canvas.style.display = 'block';
     get('scannerReticle').style.display = 'none';
@@ -1967,21 +1969,31 @@ get('scannerSnapBtn').addEventListener('click', async () => {
     get('scannerStatus').className = 'status processing show';
     get('scannerStatus').innerHTML = '<span class="spinner"></span> Nummer lezen…';
 
+    // Crop to the reticle region (85% wide, 12% tall, centred) for better OCR
+    const cropX = Math.round(canvas.width  * 0.075);
+    const cropY = Math.round(canvas.height * 0.44);
+    const cropW = Math.round(canvas.width  * 0.85);
+    const cropH = Math.round(canvas.height * 0.12);
+    const crop  = document.createElement('canvas');
+    crop.width  = cropW;
+    crop.height = cropH;
+    crop.getContext('2d').drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
     try {
-        const result = await Tesseract.recognize(canvas, 'eng', {
-            tessedit_char_whitelist: '0123456789',
-            tessedit_pageseg_mode: '7',   // single text line
+        const result = await Tesseract.recognize(crop, 'eng', {
+            logger: () => {},
+            tessedit_char_whitelist: '0123456789- ',
+            tessedit_pageseg_mode:   '7',
         });
         const digits = result.data.text.replace(/\D/g, '');
-        // Find a 10 or 13-digit ISBN within the result
-        const match = digits.match(/97[89]\d{10}|\d{10}/);
+        const match  = digits.match(/97[89]\d{10}|\d{10}/);
         if (match) {
             closeScanner();
             get('isbnInput').value = match[0];
             lookupISBN();
         } else {
             get('scannerStatus').className = 'status error show';
-            get('scannerStatus').textContent = 'Geen ISBN gevonden. Probeer opnieuw.';
+            get('scannerStatus').textContent = 'Geen ISBN gevonden — probeer opnieuw.';
             video.style.display  = 'block';
             canvas.style.display = 'none';
             get('scannerReticle').style.display = 'flex';
@@ -1990,6 +2002,9 @@ get('scannerSnapBtn').addEventListener('click', async () => {
     } catch(e) {
         get('scannerStatus').className = 'status error show';
         get('scannerStatus').textContent = 'Fout bij lezen: ' + e.message;
+        video.style.display  = 'block';
+        canvas.style.display = 'none';
+        get('scannerReticle').style.display = 'flex';
         get('scannerSnapBtn').disabled = false;
     }
 });
