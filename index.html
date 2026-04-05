@@ -566,32 +566,58 @@
             <div id="upload" class="tab-content active">
                 <div class="status" id="status"></div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem;">
-                    <button id="cameraBtn" style="background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                        📷 Camera
-                    </button>
-                    <button id="galleryBtn" style="background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                        🖼️ Galerij
-                    </button>
+                <div style="background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--olive-green); margin-bottom: 1rem; font-size: 16px;">Stap 1: Kookboek informatie</h3>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--olive-green);">ISBN-nummer (optioneel)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="quickIsbnInput" placeholder="9781445425641" style="flex: 1; padding: 12px; font-size: 15px; border: 2px solid var(--olive-green); border-radius: 8px; background: var(--cream);">
+                            <button id="quickIsbnSearchBtn" style="flex: 0 0 auto; width: auto; padding: 12px 20px; background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Zoeken</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="color: var(--olive-green);">Titel</label>
+                        <input type="text" id="quickTitle" placeholder="bijv. De keuken van Frankrijk" style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid var(--olive-green); border-radius: 8px; background: var(--cream);">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--olive-green);">Auteur (optioneel)</label>
+                        <input type="text" id="quickAuthor" placeholder="bijv. Beverley Le Blanc" style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid var(--olive-green); border-radius: 8px; background: var(--cream);">
+                    </div>
                 </div>
 
-                <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
-                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+                <div style="background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--olive-green); margin-bottom: 1rem; font-size: 16px;">Stap 2: Upload foto's</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+                        <button id="cameraBtn" style="background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            📷 Camera
+                        </button>
+                        <button id="galleryBtn" style="background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            🖼️ Galerij
+                        </button>
+                    </div>
 
-                <div id="cameraPreview" style="display: none; background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: var(--olive-green); margin-bottom: 1rem; font-size: 16px;">Gemaakte foto's:</h3>
-                    <div id="previewList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;"></div>
-                    <button id="takeProceedBtn" style="width: 100%; background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; border: none;">Doorgaan met deze foto's</button>
+                    <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+
+                    <div id="cameraPreview" style="display: none; background: var(--cream); border: 2px solid var(--olive-green); border-radius: 12px; padding: 1rem;">
+                        <h4 style="color: var(--olive-green); margin-bottom: 1rem;">Gemaakte foto's:</h4>
+                        <div id="previewList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;"></div>
+                        <button id="takeProceedBtn" style="width: 100%; background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Verwerken</button>
+                    </div>
                 </div>
 
                 <div class="instructions">
                     <h3>Hoe het werkt:</h3>
                     <ol>
-                        <li>Kies <strong>"Camera"</strong> voor directe camera-opname</li>
-                        <li>Fotografeer de <strong>inhoudsopgave</strong> van uw kookboek</li>
-                        <li>Fotografeer de <strong>ingrediëntenindex</strong> pagina's</li>
-                        <li>Klik "Doorgaan met deze foto's"</li>
-                        <li>De app verwerkt de foto's automatisch</li>
+                        <li><strong>Optioneel:</strong> Voer ISBN in en klik "Zoeken" voor automatische titel + auteur</li>
+                        <li><strong>Of:</strong> Vul titel handmatig in</li>
+                        <li>Klik <strong>"Camera"</strong> of <strong>"Galerij"</strong> om foto's te uploaden</li>
+                        <li>Fotografeer <strong>inhoudsopgave</strong> en <strong>ingrediëntenindex</strong></li>
+                        <li>Klik <strong>"Verwerken"</strong> - OCR extraheert alles automatisch!</li>
                     </ol>
                 </div>
             </div>
@@ -818,7 +844,54 @@
                 ingredientFilter.addEventListener('input', () => filterRecipes());
             }
             
-            // Camera and gallery buttons
+            // Quick ISBN search (in upload tab)
+            const quickIsbnSearchBtn = document.getElementById('quickIsbnSearchBtn');
+            if (quickIsbnSearchBtn) {
+                quickIsbnSearchBtn.addEventListener('click', async () => {
+                    const isbn = document.getElementById('quickIsbnInput').value.trim();
+                    if (!isbn) {
+                        showStatus('Voer een ISBN-nummer in', 'error');
+                        return;
+                    }
+                    showStatus('ISBN wordt opgezocht...', 'processing');
+                    try {
+                        const cleanISBN = isbn.replace(/[-\s]/g, '');
+                        
+                        // Try Open Library
+                        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanISBN}&jscmd=data&format=json`);
+                        const data = await response.json();
+                        const key = `ISBN:${cleanISBN}`;
+                        
+                        if (data[key]) {
+                            const book = data[key];
+                            document.getElementById('quickTitle').value = book.title || '';
+                            document.getElementById('quickAuthor').value = book.authors?.[0]?.name || '';
+                            showStatus(`✓ "${book.title}" gevonden!`, 'success');
+                            setTimeout(() => clearStatus(), 2000);
+                            return;
+                        }
+                        
+                        // Try Google Books
+                        const response2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanISBN}`);
+                        if (response2.ok) {
+                            const data2 = await response2.json();
+                            if (data2.items && data2.items.length > 0) {
+                                const book = data2.items[0].volumeInfo;
+                                document.getElementById('quickTitle').value = book.title || '';
+                                document.getElementById('quickAuthor').value = book.authors?.[0] || '';
+                                showStatus(`✓ "${book.title}" gevonden!`, 'success');
+                                setTimeout(() => clearStatus(), 2000);
+                                return;
+                            }
+                        }
+                        
+                        showStatus('ISBN niet gevonden. Vul titel handmatig in.', 'error');
+                    } catch (err) {
+                        showStatus('Fout bij opzoeken', 'error');
+                    }
+                });
+            }
+            
             const cameraBtn = document.getElementById('cameraBtn');
             const galleryBtn = document.getElementById('galleryBtn');
             
@@ -905,30 +978,27 @@
             const takeProceedBtn = document.getElementById('takeProceedBtn');
             if (takeProceedBtn) {
                 takeProceedBtn.addEventListener('click', async () => {
-                    let cbName = sessionStorage.getItem('cookbookTitle');
+                    let cbName = document.getElementById('quickTitle').value.trim();
                     
                     if (!cbName) {
-                        cbName = prompt('Kookboektitel?');
+                        showStatus('Voer een titel in', 'error');
+                        return;
                     }
                     
-                    if (!cbName) return;
-                    
-                    const isbn = sessionStorage.getItem('cookbookISBN');
                     const fileInputs = document.querySelectorAll('#cameraInput');
                     const lastInput = fileInputs[fileInputs.length - 1];
                     
                     if (lastInput && lastInput.files && lastInput.files.length > 0) {
                         const fileArray = Array.from(lastInput.files);
+                        const isbn = document.getElementById('quickIsbnInput').value.trim() || null;
                         processCookbook(cbName, fileArray, 0, isbn);
                         const cameraPreview = document.getElementById('cameraPreview');
                         const previewList = document.getElementById('previewList');
                         if (cameraPreview) cameraPreview.style.display = 'none';
                         if (previewList) previewList.innerHTML = '';
+                    } else {
+                        showStatus('Geen foto's geselecteerd', 'error');
                     }
-                    
-                    // Clear stored data
-                    sessionStorage.removeItem('cookbookTitle');
-                    sessionStorage.removeItem('cookbookISBN');
                 });
             }
         }
