@@ -10,218 +10,254 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --color-bg-primary: #ffffff;
-            --color-bg-secondary: #f5f5f5;
-            --color-bg-tertiary: #eeeeee;
-            --color-text-primary: #1a1a1a;
-            --color-text-secondary: #666666;
-            --color-text-tertiary: #999999;
-            --color-border: #cccccc;
-            --color-border-light: #e0e0e0;
-            --color-info: #0066cc;
-            --color-info-bg: #e6f2ff;
-            --color-success: #00aa00;
-            --color-success-bg: #e6ffe6;
-            --color-error: #dd0000;
-            --color-error-bg: #ffe6e6;
+            --cream: #faf8f3;
+            --warm-orange: #d97956;
+            --burnt-orange: #c85a3a;
+            --olive-green: #6b8e5f;
+            --sage-green: #9cb5a0;
+            --dark-brown: #3e3025;
+            --light-tan: #f4ede3;
+            --accent-gold: #c9a574;
         }
         
         @media (prefers-color-scheme: dark) {
             :root {
-                --color-bg-primary: #1a1a1a;
-                --color-bg-secondary: #2d2d2d;
-                --color-bg-tertiary: #3a3a3a;
-                --color-text-primary: #ffffff;
-                --color-text-secondary: #cccccc;
-                --color-text-tertiary: #999999;
-                --color-border: #444444;
-                --color-border-light: #333333;
-                --color-info: #4da6ff;
-                --color-info-bg: #1a3d66;
-                --color-success: #4da64d;
-                --color-success-bg: #1a3a1a;
-                --color-error: #ff6666;
-                --color-error-bg: #4d1a1a;
+                --cream: #2a2420;
+                --warm-orange: #e8956f;
+                --burnt-orange: #d97956;
+                --olive-green: #8faa7f;
+                --sage-green: #a8c9a0;
+                --dark-brown: #f4ede3;
+                --light-tan: #3e3025;
+                --accent-gold: #d4b896;
             }
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--color-bg-primary);
-            color: var(--color-text-primary);
-            line-height: 1.6;
+            font-family: 'Georgia', 'Garamond', serif;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--light-tan) 100%);
+            color: var(--dark-brown);
+            line-height: 1.8;
+            min-height: 100vh;
         }
         
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 1rem;
+            padding: 1.5rem;
             padding-bottom: 3rem;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 2rem;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--color-border-light);
+            margin-bottom: 2.5rem;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(135deg, rgba(107, 142, 95, 0.1) 0%, rgba(201, 165, 116, 0.1) 100%);
+            border-radius: 16px;
+            border: 2px solid var(--olive-green);
         }
         
         .header h1 {
-            font-size: 24px;
+            font-size: 32px;
             margin-bottom: 0.5rem;
+            color: var(--olive-green);
+            font-weight: bold;
+            letter-spacing: 1px;
         }
         
         .header p {
-            font-size: 13px;
-            color: var(--color-text-secondary);
+            font-size: 14px;
+            color: var(--warm-orange);
+            font-style: italic;
         }
         
         .user-info {
             font-size: 12px;
-            color: var(--color-text-secondary);
-            margin-top: 0.5rem;
+            color: var(--olive-green);
+            margin-top: 1rem;
+            font-weight: 600;
         }
         
         .tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--color-border-light);
+            gap: 0;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--olive-green);
             overflow-x: auto;
         }
         
         .tab-btn {
-            padding: 12px 16px;
+            padding: 14px 20px;
             background: transparent;
             border: none;
             border-bottom: 3px solid transparent;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--color-text-secondary);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark-brown);
             white-space: nowrap;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-btn:hover {
+            color: var(--warm-orange);
         }
         
         .tab-btn.active {
-            color: var(--color-text-primary);
-            border-bottom-color: var(--color-info);
+            color: var(--warm-orange);
+            border-bottom-color: var(--warm-orange);
         }
         
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease;
         }
         
         .tab-content.active {
             display: block;
         }
         
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .auth-screen {
-            max-width: 400px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: var(--color-bg-secondary);
-            border-radius: 12px;
+            max-width: 420px;
+            margin: 3rem auto;
+            padding: 2.5rem;
+            background: var(--cream);
+            border-radius: 16px;
+            border: 2px solid var(--olive-green);
+            box-shadow: 0 8px 24px rgba(62, 48, 37, 0.1);
         }
         
         .auth-screen h2 {
-            font-size: 18px;
-            margin-bottom: 1.5rem;
+            font-size: 24px;
+            margin-bottom: 2rem;
             text-align: center;
+            color: var(--olive-green);
+            font-weight: bold;
         }
         
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
         
         label {
             display: block;
             font-size: 13px;
             font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--color-text-primary);
+            margin-bottom: 8px;
+            color: var(--dark-brown);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         input[type="email"],
         input[type="password"],
         input[type="text"] {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid var(--color-border-light);
-            border-radius: 8px;
-            background: var(--color-bg-primary);
-            color: var(--color-text-primary);
+            padding: 14px;
+            font-size: 15px;
+            border: 2px solid var(--olive-green);
+            border-radius: 10px;
+            background: var(--light-tan);
+            color: var(--dark-brown);
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
         }
         
         input:focus {
             outline: none;
-            border-color: var(--color-info);
-            box-shadow: 0 0 0 2px var(--color-info-bg);
+            border-color: var(--warm-orange);
+            box-shadow: 0 0 0 3px rgba(217, 121, 86, 0.1);
+            background: var(--cream);
         }
         
         button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
             font-weight: 600;
             border: none;
-            border-radius: 8px;
-            background: var(--color-info);
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%);
             color: white;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(217, 121, 86, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(217, 121, 86, 0.4);
         }
         
         button:active {
-            transform: scale(0.98);
+            transform: translateY(0);
         }
         
         .toggle-auth {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             font-size: 13px;
         }
         
         .toggle-auth button {
             width: auto;
             background: transparent;
-            color: var(--color-info);
+            color: var(--warm-orange);
             padding: 0;
             font-weight: normal;
+            text-transform: none;
+            letter-spacing: normal;
+            box-shadow: none;
+            font-size: 13px;
+        }
+        
+        .toggle-auth button:hover {
+            transform: none;
+            text-decoration: underline;
         }
         
         .upload-area {
-            background: var(--color-bg-secondary);
-            border: 2px dashed var(--color-border);
-            border-radius: 12px;
-            padding: 3rem 1.5rem;
+            background: var(--light-tan);
+            border: 3px dashed var(--olive-green);
+            border-radius: 16px;
+            padding: 3.5rem 2rem;
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         
         .upload-area:hover {
-            border-color: var(--color-info);
-            background: var(--color-info-bg);
+            border-color: var(--warm-orange);
+            background: rgba(217, 121, 86, 0.05);
+            transform: translateY(-2px);
         }
         
         .upload-icon {
-            font-size: 48px;
+            font-size: 56px;
             margin-bottom: 1rem;
+            display: inline-block;
         }
         
         .upload-text {
-            font-size: 16px;
-            color: var(--color-text-primary);
+            font-size: 18px;
+            color: var(--dark-brown);
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .upload-hint {
-            font-size: 12px;
-            color: var(--color-text-secondary);
+            font-size: 13px;
+            color: var(--warm-orange);
+            font-style: italic;
         }
         
         input[type="file"] {
@@ -229,19 +265,20 @@
         }
         
         .instructions {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-            line-height: 1.8;
-            background: var(--color-bg-secondary);
-            padding: 1rem;
-            border-radius: 8px;
+            font-size: 14px;
+            color: var(--dark-brown);
+            line-height: 1.9;
+            background: var(--light-tan);
+            padding: 1.5rem;
+            border-radius: 12px;
             margin-top: 2rem;
+            border-left: 4px solid var(--olive-green);
         }
         
         .instructions h3 {
-            font-size: 14px;
-            color: var(--color-text-primary);
-            margin-bottom: 0.5rem;
+            font-size: 16px;
+            color: var(--olive-green);
+            margin-bottom: 1rem;
             font-weight: 600;
         }
         
@@ -250,17 +287,18 @@
         }
         
         .instructions li {
-            margin: 8px 0;
+            margin: 10px 0;
         }
         
         .status {
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border-radius: 10px;
             font-size: 13px;
             margin-bottom: 1rem;
             display: none;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-weight: 600;
         }
         
         .status.show {
@@ -268,18 +306,21 @@
         }
         
         .status.processing {
-            background: var(--color-info-bg);
-            color: var(--color-info);
+            background: rgba(217, 121, 86, 0.15);
+            color: var(--warm-orange);
+            border-left: 4px solid var(--warm-orange);
         }
         
         .status.success {
-            background: var(--color-success-bg);
-            color: var(--color-success);
+            background: rgba(107, 142, 95, 0.15);
+            color: var(--olive-green);
+            border-left: 4px solid var(--olive-green);
         }
         
         .status.error {
-            background: var(--color-error-bg);
-            color: var(--color-error);
+            background: rgba(200, 90, 58, 0.15);
+            color: var(--burnt-orange);
+            border-left: 4px solid var(--burnt-orange);
         }
         
         .spinner {
@@ -297,121 +338,160 @@
         }
         
         .cookbook-card {
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-light);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 12px;
+            background: var(--cream);
+            border: 2px solid var(--olive-green);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(107, 142, 95, 0.1);
+        }
+        
+        .cookbook-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(107, 142, 95, 0.15);
+            border-color: var(--warm-orange);
         }
         
         .cookbook-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--color-text-primary);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--olive-green);
             margin-bottom: 8px;
         }
         
         .cookbook-meta {
             font-size: 12px;
-            color: var(--color-text-secondary);
-            margin-bottom: 12px;
+            color: var(--warm-orange);
+            margin-bottom: 14px;
+            font-weight: 600;
         }
         
         .chapter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
         }
         
         .chapter-btn {
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border-light);
-            border-radius: 6px;
-            padding: 10px 12px;
-            font-size: 12px;
-            color: var(--color-text-secondary);
+            background: var(--light-tan);
+            border: 2px solid var(--sage-green);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+            color: var(--dark-brown);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             text-align: left;
-            font-weight: 500;
+            font-weight: 600;
         }
         
-        .chapter-btn:active {
-            background: var(--color-bg-tertiary);
+        .chapter-btn:hover {
+            background: rgba(107, 142, 95, 0.08);
         }
         
         .chapter-btn.active {
-            background: var(--color-info-bg);
-            color: var(--color-info);
-            border-color: var(--color-info);
+            background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%);
+            color: var(--cream);
+            border-color: var(--olive-green);
         }
         
         .filter-box {
             margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: var(--color-bg-secondary);
+            padding: 1.5rem;
+            background: var(--light-tan);
             border-radius: 12px;
+            border: 2px solid var(--sage-green);
         }
         
         .filter-label {
             font-size: 13px;
             font-weight: 600;
-            color: var(--color-text-primary);
-            margin-bottom: 8px;
+            color: var(--olive-green);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            border: 2px solid var(--olive-green);
+            border-radius: 8px;
+            background: var(--cream);
+            color: var(--dark-brown);
         }
         
         .recipe-result {
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-light);
+            background: var(--cream);
+            border: 2px solid var(--sage-green);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 1.2rem;
             margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .recipe-result:hover {
+            border-color: var(--warm-orange);
+            background: var(--light-tan);
         }
         
         .recipe-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--color-text-primary);
-            margin-bottom: 4px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--warm-orange);
+            margin-bottom: 6px;
+            text-transform: capitalize;
         }
         
         .recipe-info {
             font-size: 12px;
-            color: var(--color-text-secondary);
+            color: var(--dark-brown);
+            font-weight: 500;
         }
         
         .empty-state {
             text-align: center;
-            padding: 2rem 1rem;
-            color: var(--color-text-secondary);
+            padding: 3rem 1rem;
+            color: var(--warm-orange);
+            font-style: italic;
         }
         
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 14px;
             margin-bottom: 1.5rem;
         }
         
         .stat-card {
-            background: var(--color-bg-secondary);
-            border-radius: 12px;
-            padding: 1rem;
+            background: var(--light-tan);
+            border: 2px solid var(--olive-green);
+            border-radius: 14px;
+            padding: 1.5rem;
             text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(107, 142, 95, 0.15);
         }
         
         .stat-number {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--color-text-primary);
-            margin-bottom: 4px;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--warm-orange);
+            margin-bottom: 6px;
         }
         
         .stat-label {
             font-size: 11px;
-            color: var(--color-text-secondary);
+            color: var(--olive-green);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
         
         .logout-btn {
@@ -420,9 +500,9 @@
             width: auto;
             margin-left: auto;
             margin-right: auto;
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-size: 12px;
-            background: var(--color-error);
+            background: var(--burnt-orange);
         }
     </style>
 </head>
