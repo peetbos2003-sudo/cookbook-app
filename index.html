@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gedeelde kookboek OCR zoek-app - zoek recepten op ingrediënt en hoofdstuk">
-    <meta name="theme-color" content="#ffffff">
-    <title>Kookboek Zoeken - Gedeeld</title>
+    <meta name="description" content="Parklaankookboeken — gedeelde kookboek index voor de familie">
+    <meta name="theme-color" content="#faf8f3">
+    <title>Parklaankookboeken</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         :root {
             --cream: #faf8f3;
             --warm-orange: #d97956;
@@ -19,7 +19,7 @@
             --light-tan: #f4ede3;
             --accent-gold: #c9a574;
         }
-        
+
         @media (prefers-color-scheme: dark) {
             :root {
                 --cream: #2a2420;
@@ -32,7 +32,7 @@
                 --accent-gold: #d4b896;
             }
         }
-        
+
         body {
             font-family: 'Georgia', 'Garamond', serif;
             background: linear-gradient(135deg, var(--cream) 0%, var(--light-tan) 100%);
@@ -40,1176 +40,1605 @@
             line-height: 1.8;
             min-height: 100vh;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 1.5rem;
-            padding-bottom: 3rem;
+            padding-bottom: 4rem;
         }
-        
+
+        /* ===== AUTH ===== */
+        .auth-wrap {
+            max-width: 420px;
+            margin: 3rem auto;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-logo h1 { font-size: 26px; color: var(--olive-green); margin-bottom: 0.25rem; }
+        .auth-logo p { font-size: 13px; color: var(--warm-orange); font-style: italic; }
+
+        .auth-card {
+            background: var(--cream);
+            border-radius: 20px;
+            border: 2px solid var(--olive-green);
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(62,48,37,0.12);
+        }
+
+        /* ===== APP HEADER ===== */
         .header {
             text-align: center;
-            margin-bottom: 2.5rem;
-            padding: 2rem 1.5rem;
-            background: linear-gradient(135deg, rgba(107, 142, 95, 0.1) 0%, rgba(201, 165, 116, 0.1) 100%);
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(107,142,95,0.08) 0%, rgba(201,165,116,0.08) 100%);
             border-radius: 16px;
             border: 2px solid var(--olive-green);
+            position: relative;
         }
-        
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 0.5rem;
-            color: var(--olive-green);
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        
-        .header p {
-            font-size: 14px;
-            color: var(--warm-orange);
-            font-style: italic;
-        }
-        
-        .user-info {
-            font-size: 12px;
-            color: var(--olive-green);
-            margin-top: 1rem;
-            font-weight: 600;
-        }
-        
+
+        .header h1 { font-size: 26px; color: var(--olive-green); letter-spacing: 1px; margin-bottom: 0.2rem; }
+        .header p { font-size: 13px; color: var(--warm-orange); font-style: italic; }
+        .header-user { font-size: 12px; color: var(--olive-green); margin-top: 0.4rem; font-weight: 600; }
+
+        /* ===== TABS ===== */
         .tabs {
             display: flex;
-            gap: 0;
-            margin-bottom: 2rem;
             border-bottom: 2px solid var(--olive-green);
+            margin-bottom: 2rem;
             overflow-x: auto;
         }
-        
+
         .tab-btn {
-            padding: 14px 20px;
+            padding: 12px 22px;
             background: transparent;
             border: none;
             border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--dark-brown);
             white-space: nowrap;
-            transition: all 0.3s ease;
-            position: relative;
+            font-family: 'Georgia', serif;
+            transition: color 0.2s;
         }
-        
-        .tab-btn:hover {
-            color: var(--warm-orange);
-        }
-        
-        .tab-btn.active {
-            color: var(--warm-orange);
-            border-bottom-color: var(--warm-orange);
-        }
-        
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
+
+        .tab-btn:hover { color: var(--warm-orange); }
+        .tab-btn.active { color: var(--warm-orange); border-bottom-color: var(--warm-orange); }
+
+        .tab-content { display: none; animation: fadeIn 0.25s ease; }
+        .tab-content.active { display: block; }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        
-        .auth-screen {
-            max-width: 420px;
-            margin: 3rem auto;
-            padding: 2.5rem;
-            background: var(--cream);
-            border-radius: 16px;
+
+        /* ===== FORM ELEMENTS ===== */
+        .card {
+            background: var(--light-tan);
             border: 2px solid var(--olive-green);
-            box-shadow: 0 8px 24px rgba(62, 48, 37, 0.1);
-        }
-        
-        .auth-screen h2 {
-            font-size: 24px;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: var(--olive-green);
-            font-weight: bold;
-        }
-        
-        .form-group {
+            border-radius: 14px;
+            padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--olive-green);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group { margin-bottom: 1.1rem; }
+        .form-group:last-child { margin-bottom: 0; }
+
         label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--dark-brown);
+            font-size: 11px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            color: var(--dark-brown);
         }
-        
+
         input[type="email"],
         input[type="password"],
         input[type="text"] {
             width: 100%;
-            padding: 14px;
-            font-size: 15px;
-            border: 2px solid var(--olive-green);
+            padding: 11px 13px;
+            font-size: 14px;
+            border: 2px solid var(--sage-green);
             border-radius: 10px;
-            background: var(--light-tan);
+            background: var(--cream);
             color: var(--dark-brown);
             font-family: 'Georgia', serif;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        
+
         input:focus {
             outline: none;
             border-color: var(--warm-orange);
-            box-shadow: 0 0 0 3px rgba(217, 121, 86, 0.1);
-            background: var(--cream);
+            box-shadow: 0 0 0 3px rgba(217,121,86,0.12);
         }
-        
+
         button {
             width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
             border: none;
             border-radius: 10px;
             background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%);
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.15s, box-shadow 0.15s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(217, 121, 86, 0.3);
+            box-shadow: 0 4px 12px rgba(217,121,86,0.25);
+            font-family: 'Georgia', serif;
         }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(217, 121, 86, 0.4);
+
+        button:hover  { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(217,121,86,0.35); }
+        button:active { transform: translateY(0); }
+
+        .btn-green {
+            background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%);
+            box-shadow: 0 4px 12px rgba(107,142,95,0.25);
         }
-        
-        button:active {
-            transform: translateY(0);
+        .btn-green:hover { box-shadow: 0 6px 16px rgba(107,142,95,0.35); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--dark-brown);
+            border: 2px solid var(--sage-green);
+            box-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 600;
         }
-        
+        .btn-outline:hover { border-color: var(--warm-orange); color: var(--warm-orange); box-shadow: none; }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #c85a3a, #a04030);
+            box-shadow: 0 4px 12px rgba(200,90,58,0.25);
+        }
+
+        .btn-sm {
+            width: auto;
+            padding: 9px 16px;
+            font-size: 13px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--warm-orange);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+            width: auto;
+            box-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            font-family: 'Georgia', serif;
+            padding: 0;
+        }
+        .btn-link:hover { color: var(--burnt-orange); transform: none; box-shadow: none; }
+        .btn-link:active { transform: none; }
+
+        .btn-logout {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: auto;
+            padding: 6px 12px;
+            font-size: 11px;
+            background: var(--light-tan);
+            color: var(--dark-brown);
+            border: 1px solid var(--sage-green);
+            box-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 600;
+        }
+        .btn-logout:hover { background: var(--burnt-orange); color: white; transform: none; box-shadow: none; }
+        .btn-logout:active { transform: none; }
+
+        .inline-row { display: flex; gap: 8px; align-items: stretch; }
+        .inline-row input { flex: 1; }
+
         .toggle-auth {
             text-align: center;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             font-size: 13px;
-        }
-        
-        .toggle-auth button {
-            width: auto;
-            background: transparent;
-            color: var(--warm-orange);
-            padding: 0;
-            font-weight: normal;
-            text-transform: none;
-            letter-spacing: normal;
-            box-shadow: none;
-            font-size: 13px;
-        }
-        
-        .toggle-auth button:hover {
-            transform: none;
-            text-decoration: underline;
-        }
-        
-        .upload-area {
-            background: var(--light-tan);
-            border: 3px dashed var(--olive-green);
-            border-radius: 16px;
-            padding: 3.5rem 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .upload-area:hover {
-            border-color: var(--warm-orange);
-            background: rgba(217, 121, 86, 0.05);
-            transform: translateY(-2px);
-        }
-        
-        .upload-icon {
-            font-size: 56px;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-        
-        .upload-text {
-            font-size: 18px;
             color: var(--dark-brown);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
         }
-        
-        .upload-hint {
-            font-size: 13px;
-            color: var(--warm-orange);
-            font-style: italic;
-        }
-        
-        input[type="file"] {
-            display: none;
-        }
-        
-        .instructions {
-            font-size: 14px;
-            color: var(--dark-brown);
-            line-height: 1.9;
-            background: var(--light-tan);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-top: 2rem;
-            border-left: 4px solid var(--olive-green);
-        }
-        
-        .instructions h3 {
-            font-size: 16px;
-            color: var(--olive-green);
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-        
-        .instructions ol {
-            padding-left: 20px;
-        }
-        
-        .instructions li {
-            margin: 10px 0;
-        }
-        
+
+        /* ===== STATUS ===== */
         .status {
-            padding: 14px 16px;
+            padding: 11px 14px;
             border-radius: 10px;
             font-size: 13px;
             margin-bottom: 1rem;
-            display: none;
             align-items: center;
             gap: 10px;
             font-weight: 600;
+            display: none;
         }
-        
-        .status.show {
-            display: flex;
-        }
-        
-        .status.processing {
-            background: rgba(217, 121, 86, 0.15);
-            color: var(--warm-orange);
-            border-left: 4px solid var(--warm-orange);
-        }
-        
-        .status.success {
-            background: rgba(107, 142, 95, 0.15);
-            color: var(--olive-green);
-            border-left: 4px solid var(--olive-green);
-        }
-        
-        .status.error {
-            background: rgba(200, 90, 58, 0.15);
-            color: var(--burnt-orange);
-            border-left: 4px solid var(--burnt-orange);
-        }
-        
+        .status.show         { display: flex; }
+        .status.processing   { background: rgba(217,121,86,0.12); color: var(--warm-orange); border-left: 4px solid var(--warm-orange); }
+        .status.success      { background: rgba(107,142,95,0.12);  color: var(--olive-green); border-left: 4px solid var(--olive-green); }
+        .status.error        { background: rgba(200,90,58,0.12);   color: var(--burnt-orange); border-left: 4px solid var(--burnt-orange); }
+
         .spinner {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            width: 13px; height: 13px;
             border: 2px solid currentColor;
             border-right-color: transparent;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
+            flex-shrink: 0;
         }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== OCR PROGRESS ===== */
+        .ocr-progress {
+            background: var(--light-tan);
+            border: 2px solid var(--olive-green);
+            border-radius: 14px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
-        
-        .cookbook-card {
+
+        .ocr-progress-icon { font-size: 32px; margin-bottom: 0.75rem; }
+        .ocr-progress-title { font-weight: 700; color: var(--olive-green); margin-bottom: 0.5rem; }
+
+        .progress-track {
             background: var(--cream);
+            border-radius: 8px;
+            height: 8px;
+            margin: 0.75rem 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--olive-green), var(--warm-orange));
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .ocr-progress-detail { font-size: 12px; color: var(--warm-orange); font-style: italic; }
+
+        /* ===== OCR REVIEW ===== */
+        .review-tip {
+            background: rgba(107,142,95,0.1);
+            border: 2px solid var(--olive-green);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            font-size: 13px;
+            color: var(--olive-green);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .review-panel {
+            background: var(--light-tan);
             border: 2px solid var(--olive-green);
             border-radius: 14px;
             padding: 1.5rem;
-            margin-bottom: 14px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(107, 142, 95, 0.1);
+            margin-bottom: 1.5rem;
         }
-        
-        .cookbook-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 16px rgba(107, 142, 95, 0.15);
-            border-color: var(--warm-orange);
-        }
-        
-        .cookbook-title {
-            font-size: 18px;
+
+        .review-panel-title {
+            font-size: 13px;
             font-weight: 700;
             color: var(--olive-green);
-            margin-bottom: 8px;
-        }
-        
-        .cookbook-meta {
-            font-size: 12px;
-            color: var(--warm-orange);
-            margin-bottom: 14px;
-            font-weight: 600;
-        }
-        
-        .chapter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        
-        .chapter-btn {
-            background: var(--light-tan);
-            border: 2px solid var(--sage-green);
-            border-radius: 8px;
-            padding: 12px 14px;
-            font-size: 13px;
-            color: var(--dark-brown);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        .chapter-btn:hover {
-            background: rgba(107, 142, 95, 0.08);
-        }
-        
-        .chapter-btn.active {
-            background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%);
-            color: var(--cream);
-            border-color: var(--olive-green);
-        }
-        
-        .filter-box {
-            margin-bottom: 1.5rem;
-            padding: 1.5rem;
-            background: var(--light-tan);
-            border-radius: 12px;
-            border: 2px solid var(--sage-green);
-        }
-        
-        .filter-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--olive-green);
-            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
         }
-        
-        input[type="text"] {
+
+        .review-confidence {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        textarea.ocr-text {
             width: 100%;
-            padding: 12px;
-            font-size: 15px;
-            border: 2px solid var(--olive-green);
+            min-height: 160px;
+            padding: 11px 12px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            border: 2px solid var(--sage-green);
             border-radius: 8px;
             background: var(--cream);
             color: var(--dark-brown);
+            resize: vertical;
+            line-height: 1.6;
         }
-        
-        .recipe-result {
-            background: var(--cream);
-            border: 2px solid var(--sage-green);
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 10px;
-            transition: all 0.2s ease;
-        }
-        
-        .recipe-result:hover {
+        textarea.ocr-text:focus {
+            outline: none;
             border-color: var(--warm-orange);
-            background: var(--light-tan);
         }
-        
-        .recipe-title {
-            font-size: 15px;
+
+        .review-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--cream);
+            border-radius: 8px;
+            border: 1px solid var(--sage-green);
+            display: none;
+        }
+
+        .review-preview-title {
+            font-size: 11px;
             font-weight: 700;
-            color: var(--warm-orange);
-            margin-bottom: 6px;
-            text-transform: capitalize;
+            color: var(--olive-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
         }
-        
-        .recipe-info {
+
+        .preview-tag {
+            display: inline-block;
+            background: var(--light-tan);
+            border: 1px solid var(--sage-green);
+            border-radius: 6px;
+            padding: 3px 8px;
             font-size: 12px;
             color: var(--dark-brown);
-            font-weight: 500;
+            margin: 2px;
         }
-        
+
+        .review-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 1.5rem;
+        }
+
+        /* ===== PHOTO PREVIEW ===== */
+        .photo-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: var(--cream);
+            border-radius: 10px;
+            border: 1px solid var(--sage-green);
+            margin-bottom: 8px;
+        }
+
+        .photo-thumb {
+            width: 58px; height: 58px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .photo-label { font-weight: 600; color: var(--olive-green); font-size: 13px; }
+        .photo-size  { font-size: 11px; color: var(--warm-orange); }
+
+        /* ===== BROWSE STATS ===== */
+        .browse-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--light-tan);
+            border: 2px solid var(--olive-green);
+            border-radius: 12px;
+            padding: 1.1rem;
+            text-align: center;
+        }
+
+        .stat-number { display: block; font-size: 28px; font-weight: 700; color: var(--warm-orange); }
+        .stat-label  { font-size: 10px; color: var(--olive-green); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
+        /* ===== COOKBOOK GRID ===== */
+        .cookbook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 2rem;
+        }
+
+        .cookbook-card {
+            background: var(--cream);
+            border: 2px solid var(--sage-green);
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 3px 10px rgba(107,142,95,0.07);
+        }
+
+        .cookbook-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--warm-orange);
+            box-shadow: 0 8px 20px rgba(217,121,86,0.15);
+        }
+
+        .cookbook-cover {
+            width: 100%;
+            height: 110px;
+            background: linear-gradient(135deg, var(--olive-green), var(--sage-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            overflow: hidden;
+        }
+
+        .cookbook-cover img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        .cookbook-card-body { padding: 0.9rem; }
+        .cookbook-card-title  { font-size: 14px; font-weight: 700; color: var(--olive-green); line-height: 1.3; margin-bottom: 3px; }
+        .cookbook-card-author { font-size: 12px; color: var(--accent-gold); font-style: italic; margin-bottom: 6px; }
+        .cookbook-card-stats  { font-size: 11px; color: var(--warm-orange); font-weight: 600; }
+
+        /* ===== GLOBAL SEARCH ===== */
+        .search-box {
+            background: var(--light-tan);
+            border: 2px solid var(--sage-green);
+            border-radius: 12px;
+            padding: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-result {
+            background: var(--cream);
+            border: 1px solid var(--sage-green);
+            border-radius: 10px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 7px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .search-result:hover { border-color: var(--warm-orange); }
+
+        .search-result-name { font-size: 15px; font-weight: 700; color: var(--warm-orange); text-transform: capitalize; }
+        .search-result-meta { font-size: 12px; color: var(--dark-brown); margin-top: 2px; }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(62,48,37,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--cream);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 680px;
+            margin: 2rem auto;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(62,48,37,0.3);
+            animation: modalIn 0.25s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(-16px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--olive-green), var(--sage-green));
+            color: white;
+            position: relative;
+        }
+
+        .modal-cover {
+            width: 75px; height: 95px;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .modal-cover img { width: 100%; height: 100%; object-fit: cover; border-radius: 7px; }
+
+        .modal-info h2  { font-size: 19px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+        .modal-author   { font-size: 13px; opacity: 0.85; font-style: italic; margin-bottom: 3px; }
+        .modal-isbn     { font-size: 11px; opacity: 0.65; }
+        .modal-added-by { font-size: 11px; opacity: 0.65; margin-top: 2px; }
+
+        .modal-close {
+            position: absolute;
+            top: 0.9rem; right: 0.9rem;
+            width: 30px; height: 30px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            width: auto;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.35); transform: none; box-shadow: none; }
+        .modal-close:active { transform: none; }
+
+        .modal-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--light-tan);
+        }
+
+        .modal-tab-btn {
+            padding: 11px 18px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark-brown);
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            width: auto;
+            box-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .modal-tab-btn:hover  { color: var(--warm-orange); transform: none; box-shadow: none; }
+        .modal-tab-btn.active { color: var(--warm-orange); border-bottom-color: var(--warm-orange); }
+        .modal-tab-btn:active { transform: none; }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 55vh;
+            overflow-y: auto;
+        }
+
+        .modal-tab-pane { display: none; }
+        .modal-tab-pane.active { display: block; }
+
+        /* Chapter list */
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 13px;
+            background: var(--light-tan);
+            border: 1px solid var(--sage-green);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .chapter-item:hover  { border-color: var(--warm-orange); }
+        .chapter-item.active { border-color: var(--olive-green); background: rgba(107,142,95,0.1); }
+        .chapter-page { font-size: 12px; color: var(--warm-orange); font-weight: 600; flex-shrink: 0; margin-left: 8px; }
+
+        /* Ingredient list */
+        .ing-list {
+            background: var(--light-tan);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .ing-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--cream);
+            font-size: 13px;
+        }
+        .ing-item:last-child { border-bottom: none; }
+        .ing-name  { text-transform: capitalize; }
+        .ing-pages { font-size: 12px; color: var(--warm-orange); font-weight: 600; flex-shrink: 0; margin-left: 8px; }
+
+        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
             color: var(--warm-orange);
-            font-style: italic;
         }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 1.5rem;
-        }
-        
-        .stat-card {
-            background: var(--light-tan);
-            border: 2px solid var(--olive-green);
-            border-radius: 14px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(107, 142, 95, 0.15);
-        }
-        
-        .stat-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--warm-orange);
-            margin-bottom: 6px;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: var(--olive-green);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        .logout-btn {
-            display: block;
-            margin-top: 2rem;
-            width: auto;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 10px 20px;
-            font-size: 12px;
-            background: var(--burnt-orange);
+        .empty-state p { font-style: italic; }
+        .empty-state p + p { font-size: 12px; margin-top: 0.5rem; opacity: 0.7; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 560px) {
+            .cookbook-grid { grid-template-columns: repeat(2, 1fr); }
+            .browse-stats  { grid-template-columns: repeat(3, 1fr); }
+            .review-actions { grid-template-columns: 1fr; }
+            .modal-overlay { padding: 0; align-items: flex-end; }
+            .modal { margin: 0; border-radius: 20px 20px 0 0; }
+            .modal-header { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="authContainer" style="display: none;">
-            <div class="auth-screen">
-                <h2 id="authTitle">Registreer om te beginnen</h2>
-                
-                <div id="signupForm">
+<div class="container">
+
+    <!-- ===== AUTH ===== -->
+    <div id="authContainer" style="display:none">
+        <div class="auth-wrap">
+            <div class="auth-logo">
+                <h1>📚 Parklaankookboeken</h1>
+                <p>Gedeelde kookboek index voor de familie</p>
+            </div>
+
+            <div class="auth-card">
+                <!-- Login -->
+                <div id="screenLogin">
+                    <div id="loginErr" class="status error" style="margin-bottom:1rem"></div>
                     <div class="form-group">
                         <label>E-mailadres</label>
-                        <input type="email" id="email" placeholder="uw@email.com">
+                        <input type="email" id="loginEmail" placeholder="uw@email.com" autocomplete="email">
                     </div>
                     <div class="form-group">
                         <label>Wachtwoord</label>
-                        <input type="password" id="password" placeholder="••••••••">
+                        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                    <button id="loginBtn">Inloggen</button>
+                    <div class="toggle-auth">
+                        <button class="btn-link" id="showForgotBtn">Wachtwoord vergeten?</button>
+                    </div>
+                    <div class="toggle-auth">
+                        Geen account? <button class="btn-link" id="toSignupBtn">Registreer</button>
+                    </div>
+                </div>
+
+                <!-- Signup -->
+                <div id="screenSignup" style="display:none">
+                    <div id="signupErr" class="status error" style="margin-bottom:1rem"></div>
+                    <div class="form-group">
+                        <label>E-mailadres</label>
+                        <input type="email" id="signupEmail" placeholder="uw@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Wachtwoord</label>
+                        <input type="password" id="signupPass" placeholder="Min. 6 tekens" autocomplete="new-password">
                     </div>
                     <div class="form-group">
                         <label>Uw naam</label>
-                        <input type="text" id="name" placeholder="bijv. Moeder">
+                        <input type="text" id="signupName" placeholder="bijv. Moeder of Vader">
                     </div>
-                    <div id="errorMsg" style="color: var(--burnt-orange); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
                     <button id="signupBtn">Account aanmaken</button>
                     <div class="toggle-auth">
-                        Hebt u al een account? <button id="toggleToLogin">Inloggen</button>
+                        Al een account? <button class="btn-link" id="toLoginBtn">Inloggen</button>
                     </div>
                 </div>
 
-                <div id="loginForm" style="display: none;">
+                <!-- Forgot password -->
+                <div id="screenForgot" style="display:none">
+                    <p style="font-size:13px;margin-bottom:1rem;color:var(--dark-brown)">
+                        Vul uw e-mailadres in en u ontvangt een link om uw wachtwoord te resetten.
+                    </p>
+                    <div id="forgotMsg" class="status" style="margin-bottom:1rem"></div>
                     <div class="form-group">
                         <label>E-mailadres</label>
-                        <input type="email" id="loginEmail" placeholder="uw@email.com">
+                        <input type="email" id="forgotEmail" placeholder="uw@email.com">
                     </div>
-                    <div class="form-group">
-                        <label>Wachtwoord</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••">
-                    </div>
-                    <div id="loginErrorMsg" style="color: var(--burnt-orange); font-size: 12px; margin-bottom: 1rem; display: none;"></div>
-                    <button id="loginBtn">Inloggen</button>
+                    <button id="forgotSendBtn">Reset-link versturen</button>
                     <div class="toggle-auth">
-                        Geen account? <button id="toggleToSignup">Registreer</button>
+                        <button class="btn-link" id="backToLoginBtn">Terug naar inloggen</button>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div id="appContainer" style="display: none;">
-            <div class="header">
-                <h1>📚 Kookboek Zoeken</h1>
-                <p>Vind recepten op hoofdstuk en ingrediënt</p>
-                <div class="user-info">Ingelogd als <strong id="userDisplay"></strong></div>
-            </div>
-
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="upload">Kookboeken toevoegen</button>
-                <button class="tab-btn" data-tab="browse">Bladeren & zoeken</button>
-            </div>
-
-            <div id="upload" class="tab-content active">
-                <div class="status" id="status"></div>
-
-                <div style="background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: var(--olive-green); margin-bottom: 1rem; font-size: 16px;">Stap 1: Kookboek informatie</h3>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--olive-green);">ISBN-nummer (optioneel)</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="quickIsbnInput" placeholder="9781445425641" style="flex: 1; padding: 12px; font-size: 15px; border: 2px solid var(--olive-green); border-radius: 8px; background: var(--cream);">
-                            <button id="quickIsbnSearchBtn" style="flex: 0 0 auto; width: auto; padding: 12px 20px; background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Zoeken</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label style="color: var(--olive-green);">Titel</label>
-                        <input type="text" id="quickTitle" placeholder="bijv. De keuken van Frankrijk" style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid var(--olive-green); border-radius: 8px; background: var(--cream);">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--olive-green);">Auteur (optioneel)</label>
-                        <input type="text" id="quickAuthor" placeholder="bijv. Beverley Le Blanc" style="width: 100%; padding: 12px; font-size: 15px; border: 2px solid var(--olive-green); border-radius: 8px; background: var(--cream);">
-                    </div>
-                </div>
-
-                <div style="background: var(--light-tan); border: 2px solid var(--olive-green); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: var(--olive-green); margin-bottom: 1rem; font-size: 16px;">Stap 2: Upload foto's</h3>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
-                        <button id="cameraBtn" style="background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                            📷 Camera
-                        </button>
-                        <button id="galleryBtn" style="background: linear-gradient(135deg, var(--warm-orange) 0%, var(--burnt-orange) 100%); color: white; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                            🖼️ Galerij
-                        </button>
-                    </div>
-
-                    <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
-                    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
-
-                    <div id="cameraPreview" style="display: none; background: var(--cream); border: 2px solid var(--olive-green); border-radius: 12px; padding: 1rem;">
-                        <h4 style="color: var(--olive-green); margin-bottom: 1rem;">Gemaakte foto's:</h4>
-                        <div id="previewList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;"></div>
-                        <button id="takeProceedBtn" style="width: 100%; background: linear-gradient(135deg, var(--olive-green) 0%, var(--sage-green) 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Verwerken</button>
-                    </div>
-                </div>
-
-                <div class="instructions">
-                    <h3>Hoe het werkt:</h3>
-                    <ol>
-                        <li><strong>Optioneel:</strong> Voer ISBN in en klik "Zoeken" voor automatische titel + auteur</li>
-                        <li><strong>Of:</strong> Vul titel handmatig in</li>
-                        <li>Klik <strong>"Camera"</strong> of <strong>"Galerij"</strong> om foto's te uploaden</li>
-                        <li>Fotografeer <strong>inhoudsopgave</strong> en <strong>ingrediëntenindex</strong></li>
-                        <li>Klik <strong>"Verwerken"</strong> - OCR extraheert alles automatisch!</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div id="browse" class="tab-content">
-                <div id="browsePlaceholder" class="empty-state">
-                    <p>Nog geen kookboeken toegevoegd.</p>
-                    <p style="font-size: 12px; margin-top: 0.5rem;">Ga naar "Kookboeken toevoegen" om uw eerste kookboek te uploaden.</p>
-                </div>
-
-                <div id="stats" class="stats" style="display: none;">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalChapters">0</div>
-                        <div class="stat-label">Hoofdstukken</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalIngredients">0</div>
-                        <div class="stat-label">Ingrediënten</div>
-                    </div>
-                </div>
-
-                <div id="cookbooksList"></div>
-                
-                <div id="filterSection" style="display: none;">
-                    <div class="filter-box">
-                        <div class="filter-label">Filter op ingrediënt (optioneel)</div>
-                        <input type="text" id="ingredientFilter" placeholder="Type ingrediënt, bijv. 'kip', 'tomaat', 'kaas'...">
-                    </div>
-                    <div id="resultsSection"></div>
-                </div>
-            </div>
-
-            <button class="logout-btn" id="logoutBtn">Afmelden</button>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
-    <script type="module">
-        const firebaseConfig = {
-            apiKey: "AIzaSyC61fB06PkQkB0EIK8C8zjvyUNQDajnztE",
-            authDomain: "cookbook-app-50168.firebaseapp.com",
-            projectId: "cookbook-app-50168",
-            storageBucket: "cookbook-app-50168.firebasestorage.app",
-            messagingSenderId: "764959426777",
-            appId: "1:764959426777:web:0331e7cce24252508956c8"
-        };
+    <!-- ===== APP ===== -->
+    <div id="appContainer" style="display:none">
+        <div class="header">
+            <button class="btn-logout" id="logoutBtn">Afmelden</button>
+            <h1>📚 Parklaankookboeken</h1>
+            <p>Vind recepten op hoofdstuk en ingrediënt</p>
+            <div class="header-user">Ingelogd als <strong id="userDisplay"></strong></div>
+        </div>
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="tabUpload">Kookboek toevoegen</button>
+            <button class="tab-btn" data-tab="tabBrowse">Bladeren &amp; zoeken</button>
+        </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        <!-- ===== UPLOAD TAB ===== -->
+        <div id="tabUpload" class="tab-content active">
+            <div id="uploadStatus" class="status"></div>
 
-        const appState = {
-            user: null,
-            cookbooks: [],
-            selectedCookbook: null,
-            selectedChapter: null,
-        };
+            <!-- Step 1: Book info -->
+            <div id="step1" class="card">
+                <div class="card-title">Stap 1 — Kookboek informatie</div>
 
-        // Auth UI
-        function showAuthUI() {
-            document.getElementById('authContainer').style.display = 'block';
-            document.getElementById('appContainer').style.display = 'none';
-        }
-
-        function showAppUI() {
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            renderBrowse();
-        }
-
-        document.getElementById('toggleToLogin').addEventListener('click', () => {
-            document.getElementById('signupForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('authTitle').textContent = 'Sign in';
-        });
-
-        document.getElementById('toggleToSignup').addEventListener('click', () => {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('signupForm').style.display = 'block';
-            document.getElementById('authTitle').textContent = 'Sign up to get started';
-        });
-
-        document.getElementById('signupBtn').addEventListener('click', async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const name = document.getElementById('name').value;
-            const errorMsg = document.getElementById('errorMsg');
-
-            if (!email || !password || !name) {
-                errorMsg.textContent = 'Please fill in all fields';
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            try {
-                const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                await addDoc(collection(db, 'users'), {
-                    uid: userCred.user.uid,
-                    name: name,
-                    email: email,
-                    createdAt: new Date()
-                });
-                errorMsg.style.display = 'none';
-            } catch (error) {
-                errorMsg.textContent = error.message;
-                errorMsg.style.display = 'block';
-            }
-        });
-
-        document.getElementById('loginBtn').addEventListener('click', async () => {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorMsg = document.getElementById('loginErrorMsg');
-
-            if (!email || !password) {
-                errorMsg.textContent = 'Please fill in all fields';
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                errorMsg.style.display = 'none';
-            } catch (error) {
-                errorMsg.textContent = error.message;
-                errorMsg.style.display = 'block';
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await signOut(auth);
-        });
-
-        // Auth state listener
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                appState.user = user;
-                document.getElementById('userDisplay').textContent = user.email.split('@')[0];
-                
-                // Listen to cookbooks
-                const q = query(collection(db, 'cookbooks'), where('userId', '==', user.uid));
-                onSnapshot(q, (snapshot) => {
-                    appState.cookbooks = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    renderBrowse();
-                });
-                
-                showAppUI();
-                setupEventListeners();
-                setupCameraPreviewListener();
-            } else {
-                showAuthUI();
-            }
-        });
-
-        function setupEventListeners() {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const tabId = e.target.dataset.tab;
-                    const tabElement = document.getElementById(tabId);
-                    
-                    if (tabElement) {
-                        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                        tabElement.classList.add('active');
-                        e.target.classList.add('active');
-                    }
-                });
-            });
-
-            const fileInput = document.getElementById('fileInput');
-            const cameraInput = document.getElementById('cameraInput');
-            
-            if (fileInput) {
-                fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-            }
-            if (cameraInput) {
-                cameraInput.addEventListener('change', (e) => handleCameraFiles(e.target.files));
-            }
-            
-            const ingredientFilter = document.getElementById('ingredientFilter');
-            if (ingredientFilter) {
-                ingredientFilter.addEventListener('input', () => filterRecipes());
-            }
-            
-            // Quick ISBN search (in upload tab)
-            const quickIsbnSearchBtn = document.getElementById('quickIsbnSearchBtn');
-            if (quickIsbnSearchBtn) {
-                quickIsbnSearchBtn.addEventListener('click', async () => {
-                    const isbn = document.getElementById('quickIsbnInput').value.trim();
-                    if (!isbn) {
-                        showStatus('Voer een ISBN-nummer in', 'error');
-                        return;
-                    }
-                    showStatus('ISBN wordt opgezocht...', 'processing');
-                    try {
-                        const cleanISBN = isbn.replace(/[-\s]/g, '');
-                        
-                        // Try Open Library
-                        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanISBN}&jscmd=data&format=json`);
-                        const data = await response.json();
-                        const key = `ISBN:${cleanISBN}`;
-                        
-                        if (data[key]) {
-                            const book = data[key];
-                            document.getElementById('quickTitle').value = book.title || '';
-                            document.getElementById('quickAuthor').value = book.authors?.[0]?.name || '';
-                            showStatus(`✓ "${book.title}" gevonden!`, 'success');
-                            setTimeout(() => clearStatus(), 2000);
-                            return;
-                        }
-                        
-                        // Try Google Books
-                        const response2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanISBN}`);
-                        if (response2.ok) {
-                            const data2 = await response2.json();
-                            if (data2.items && data2.items.length > 0) {
-                                const book = data2.items[0].volumeInfo;
-                                document.getElementById('quickTitle').value = book.title || '';
-                                document.getElementById('quickAuthor').value = book.authors?.[0] || '';
-                                showStatus(`✓ "${book.title}" gevonden!`, 'success');
-                                setTimeout(() => clearStatus(), 2000);
-                                return;
-                            }
-                        }
-                        
-                        showStatus('ISBN niet gevonden. Vul titel handmatig in.', 'error');
-                    } catch (err) {
-                        showStatus('Fout bij opzoeken', 'error');
-                    }
-                });
-            }
-            
-            const cameraBtn = document.getElementById('cameraBtn');
-            const galleryBtn = document.getElementById('galleryBtn');
-            
-            if (cameraBtn) {
-                cameraBtn.addEventListener('click', () => {
-                    if (cameraInput) cameraInput.click();
-                });
-            }
-            
-            if (galleryBtn) {
-                galleryBtn.addEventListener('click', () => {
-                    if (fileInput) fileInput.click();
-                });
-            }
-            
-        }
-
-        async function handleCameraFiles(files) {
-            const fileArray = Array.from(files);
-            if (fileArray.length === 0) return;
-            
-            // Show preview
-            const previewList = document.getElementById('previewList');
-            previewList.innerHTML = '';
-            
-            fileArray.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const photoLabel = index === 0 ? 'Inhoudsopgave' : 'Ingrediëntenindex';
-                    const previewItem = document.createElement('div');
-                    previewItem.style.cssText = 'padding: 10px; background: var(--cream); border-radius: 8px; border: 1px solid var(--olive-green);';
-                    previewItem.innerHTML = `
-                        <div style="font-weight: 600; color: var(--olive-green); margin-bottom: 8px;">${photoLabel}</div>
-                        <img src="${e.target.result}" style="width: 100%; border-radius: 6px; max-height: 200px; object-fit: cover;">
-                    `;
-                    previewList.appendChild(previewItem);
-                };
-                reader.readAsDataURL(file);
-            });
-            
-            document.getElementById('cameraPreview').style.display = 'block';
-            
-            // Store files for later processing
-            document.getElementById('cameraPreview').dataset.files = JSON.stringify(
-                fileArray.map(f => ({ name: f.name, size: f.size }))
-            );
-            document.getElementById('cameraPreview').dataset.fileObjects = fileArray;
-        }
-        
-        // Handle proceed with camera files
-        function setupCameraPreviewListener() {
-            const takeProceedBtn = document.getElementById('takeProceedBtn');
-            if (takeProceedBtn) {
-                takeProceedBtn.addEventListener('click', async () => {
-                    let cbName = document.getElementById('quickTitle').value.trim();
-                    
-                    if (!cbName) {
-                        showStatus('Voer een titel in', 'error');
-                        return;
-                    }
-                    
-                    const fileInputs = document.querySelectorAll('#cameraInput');
-                    const lastInput = fileInputs[fileInputs.length - 1];
-                    
-                    if (lastInput && lastInput.files && lastInput.files.length > 0) {
-                        const fileArray = Array.from(lastInput.files);
-                        const isbn = document.getElementById('quickIsbnInput').value.trim() || null;
-                        processCookbook(cbName, fileArray, 0, isbn);
-                        const cameraPreview = document.getElementById('cameraPreview');
-                        const previewList = document.getElementById('previewList');
-                        if (cameraPreview) cameraPreview.style.display = 'none';
-                        if (previewList) previewList.innerHTML = '';
-                    } else {
-                        showStatus("Geen foto's geselecteerd", 'error');
-                    }
-                });
-            }
-        }
-
-        async function handleFiles(files) {
-            let cbName = sessionStorage.getItem('cookbookTitle');
-            
-            if (!cbName) {
-                cbName = prompt('Kookboektitel?');
-            }
-            
-            if (!cbName) return;
-            
-            const isbn = sessionStorage.getItem('cookbookISBN');
-            const fileArray = Array.from(files);
-            processCookbook(cbName, fileArray, 0, isbn);
-            
-            // Clear stored data
-            sessionStorage.removeItem('cookbookTitle');
-            sessionStorage.removeItem('cookbookISBN');
-        }
-
-        async function lookupISBN(isbn) {
-            showIsbnStatus('ISBN wordt opgezocht...', 'processing');
-            console.log('Looking up ISBN:', isbn);
-            
-            try {
-                const cleanISBN = isbn.replace(/[-\s]/g, '');
-                console.log('Clean ISBN:', cleanISBN);
-                
-                // Try Open Library first (better CORS support)
-                try {
-                    console.log('Trying Open Library API...');
-                    const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanISBN}&jscmd=data&format=json`);
-                    console.log('Open Library response status:', response.status);
-                    const data = await response.json();
-                    console.log('Open Library data:', data);
-                    const key = `ISBN:${cleanISBN}`;
-                    
-                    if (data[key]) {
-                        const book = data[key];
-                        console.log('Book found:', book);
-                        document.getElementById('isbnTitle').value = book.title || 'Onbekend';
-                        document.getElementById('isbnAuthor').value = book.authors?.[0]?.name || 'Onbekende auteur';
-                        document.getElementById('isbnDisplay').value = cleanISBN;
-                        document.getElementById('isbnResults').style.display = 'block';
-                        clearIsbnStatus();
-                        return;
-                    }
-                } catch (e) {
-                    console.log('Open Library failed:', e.message);
-                }
-                
-                // Fallback: Try Google Books
-                try {
-                    console.log('Trying Google Books API...');
-                    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanISBN}`);
-                    console.log('Google Books response status:', response.status);
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Google Books data:', data);
-                        if (data.items && data.items.length > 0) {
-                            const book = data.items[0].volumeInfo;
-                            console.log('Book found:', book);
-                            document.getElementById('isbnTitle').value = book.title || 'Onbekend';
-                            document.getElementById('isbnAuthor').value = book.authors?.[0] || 'Onbekende auteur';
-                            document.getElementById('isbnDisplay').value = cleanISBN;
-                            document.getElementById('isbnResults').style.display = 'block';
-                            clearIsbnStatus();
-                            return;
-                        }
-                    }
-                } catch (e) {
-                    console.log('Google Books failed:', e.message);
-                }
-                
-                console.log('ISBN not found in any source');
-                showIsbnStatus('ISBN niet gevonden. Voer gegevens handmatig in.', 'error');
-            } catch (err) {
-                console.error('ISBN lookup error:', err);
-                showIsbnStatus('Fout bij opzoeken. Controleer uw internetverbinding.', 'error');
-            }
-        }
-        
-        function showIsbnStatus(msg, type) {
-            const status = document.getElementById('isbnStatus');
-            status.textContent = msg;
-            status.className = `status show ${type}`;
-        }
-        
-        function clearIsbnStatus() {
-            document.getElementById('isbnStatus').classList.remove('show');
-        }
-
-        async function processCookbook(cbName, files, index, isbn = null) {
-            if (index >= files.length) {
-                return;
-            }
-
-            const file = files[index];
-            const fileType = index === 0 ? 'inhoudsopgave' : 'ingrediëntenindex';
-            
-            showStatus(`${fileType.toUpperCase()} wordt verwerkt...`, 'processing');
-
-            try {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    const result = await Tesseract.recognize(e.target.result, 'eng');
-                    const text = result.data.text;
-                    
-                    console.log(`=== OCR OUTPUT FOR ${fileType.toUpperCase()} ===`);
-                    console.log(text);
-                    console.log(`=== END OCR OUTPUT ===`);
-
-                    if (index === 0) {
-                        await processCookbook(cbName, files, index + 1, isbn);
-                    } else {
-                        // Save to Firebase
-                        const chapters = extractChapters(text);
-                        const ingredients = extractIngredients(text);
-                        
-                        console.log('Extracted chapters:', chapters);
-                        console.log('Extracted ingredients:', ingredients);
-                        
-                        await addDoc(collection(db, 'cookbooks'), {
-                            userId: appState.user.uid,
-                            title: cbName,
-                            isbn: isbn || null,
-                            chapters: chapters,
-                            ingredients: ingredients,
-                            createdAt: new Date()
-                        });
-                        
-                        showStatus(`✓ "${cbName}" toegevoegd!`, 'success');
-                        setTimeout(() => clearStatus(), 2000);
-                    }
-                };
-                reader.readAsDataURL(file);
-            } catch (err) {
-                console.error('Error processing image:', err);
-                showStatus('Fout bij verwerken van afbeelding', 'error');
-            }
-        }
-
-        function extractChapters(text) {
-            const lines = text.split('\n').filter(l => l.trim());
-            const chapters = [];
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : '';
-                
-                const pageMatch = nextLine.match(/^\d+$/);
-                if (pageMatch && !line.match(/^\d+$/) && line.length > 2 && line.length < 100) {
-                    chapters.push({
-                        name: line,
-                        startPage: parseInt(pageMatch[0])
-                    });
-                }
-            }
-            return chapters;
-        }
-
-        function extractIngredients(text) {
-            const lines = text.split('\n').filter(l => l.trim());
-            const ingredients = [];
-
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed) continue;
-
-                const match = trimmed.match(/^([A-Za-z\s\-']+?)(\s+\d+(?:\s*-\s*\d+)?)?$/);
-                
-                if (match) {
-                    const name = match[1].trim().toLowerCase();
-                    const pages = match[2] ? match[2].trim() : null;
-                    
-                    if (name.length > 2 && name.length < 60 && !name.match(/^\d/)) {
-                        ingredients.push({ name, pages });
-                    }
-                }
-            }
-            return ingredients;
-        }
-
-        function renderBrowse() {
-            const container = document.getElementById('cookbooksList');
-            const placeholder = document.getElementById('browsePlaceholder');
-            const filterSection = document.getElementById('filterSection');
-            const stats = document.getElementById('stats');
-
-            if (appState.cookbooks.length === 0) {
-                container.innerHTML = '';
-                placeholder.style.display = 'block';
-                filterSection.style.display = 'none';
-                stats.style.display = 'none';
-                return;
-            }
-
-            placeholder.style.display = 'none';
-            stats.style.display = 'grid';
-
-            const totalChapters = appState.cookbooks.reduce((sum, cb) => sum + cb.chapters.length, 0);
-            const totalIngredients = appState.cookbooks.reduce((sum, cb) => sum + cb.ingredients.length, 0);
-            
-            document.getElementById('totalChapters').textContent = totalChapters;
-            document.getElementById('totalIngredients').textContent = totalIngredients;
-
-            container.innerHTML = appState.cookbooks.map(cb => `
-                <div class="cookbook-card">
-                    <div class="cookbook-title">${cb.title}</div>
-                    <div class="cookbook-meta">${cb.chapters.length} hoofdstukken • ${cb.ingredients.length} ingrediënten</div>
-                    <div class="chapter-grid">
-                        ${cb.chapters.map((ch, idx) => `
-                            <button class="chapter-btn" onclick="window.selectChapter('${cb.id}', ${idx})">
-                                ${ch.name}
-                            </button>
-                        `).join('')}
+                <div class="form-group">
+                    <label>ISBN-nummer (optioneel)</label>
+                    <div class="inline-row">
+                        <input type="text" id="isbnInput" placeholder="bijv. 9781445425641">
+                        <button id="isbnSearchBtn" class="btn-sm btn-green">Zoeken</button>
                     </div>
                 </div>
-            `).join('');
-
-            if (appState.selectedCookbook) {
-                filterSection.style.display = 'block';
-                filterRecipes();
-            }
-        }
-
-        window.selectChapter = (cbId, chapterId) => {
-            appState.selectedCookbook = appState.cookbooks.find(c => c.id === cbId);
-            appState.selectedChapter = appState.selectedCookbook.chapters[chapterId];
-            document.getElementById('ingredientFilter').value = '';
-            filterRecipes();
-        };
-
-        function filterRecipes() {
-            if (!appState.selectedChapter || !appState.selectedCookbook) return;
-
-            const filter = document.getElementById('ingredientFilter').value.toLowerCase();
-            const results = document.getElementById('resultsSection');
-
-            let matchedIngredients = [];
-            
-            if (filter) {
-                matchedIngredients = appState.selectedCookbook.ingredients
-                    .filter(ing => ing.name.includes(filter));
-            } else {
-                matchedIngredients = appState.selectedCookbook.ingredients.slice(0, 30);
-            }
-
-            if (matchedIngredients.length === 0) {
-                results.innerHTML = '<div class="empty-state">No matching ingredients found</div>';
-                return;
-            }
-
-            results.innerHTML = `
-                <div style="margin-bottom: 1rem;">
-                    <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 12px;">
-                        Found ${matchedIngredients.length} ingredient${matchedIngredients.length !== 1 ? 's' : ''} in <strong>${appState.selectedChapter.name}</strong>
-                    </p>
-                    ${matchedIngredients.map(ing => `
-                        <div class="recipe-result">
-                            <div class="recipe-title">${ing.name}</div>
-                            <div class="recipe-info">Pages: ${ing.pages || 'N/A'}</div>
-                        </div>
-                    `).join('')}
+                <div class="form-group">
+                    <label>Titel <span style="color:var(--burnt-orange)">*</span></label>
+                    <input type="text" id="titleInput" placeholder="bijv. De keuken van Frankrijk">
                 </div>
-            `;
-        }
+                <div class="form-group">
+                    <label>Auteur (optioneel)</label>
+                    <input type="text" id="authorInput" placeholder="bijv. Beverley Le Blanc">
+                </div>
+            </div>
 
-        function showStatus(msg, type) {
-            const status = document.getElementById('status');
-            status.textContent = msg;
-            status.className = `status show ${type}`;
-        }
+            <!-- Step 2: Photos -->
+            <div id="step2" class="card">
+                <div class="card-title">Stap 2 — Foto's uploaden</div>
+                <p style="font-size:13px;color:var(--dark-brown);margin-bottom:1rem;font-style:italic">
+                    Fotografeer de <strong>inhoudsopgave</strong> (eerste foto) en de
+                    <strong>ingrediëntenindex</strong> (tweede foto). U kunt meerdere foto's tegelijk selecteren.
+                </p>
 
-        function clearStatus() {
-            document.getElementById('status').classList.remove('show');
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+                    <button id="cameraBtn" class="btn-green">📷 Camera</button>
+                    <button id="galleryBtn">🖼️ Galerij</button>
+                </div>
+
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" multiple style="display:none">
+                <input type="file" id="fileInput"   accept="image/*" multiple style="display:none">
+
+                <div id="photoPreview" style="display:none">
+                    <div id="photoList"></div>
+                    <button id="processBtn" style="margin-top:1rem">Verwerken met OCR →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: OCR progress -->
+            <div id="step3" style="display:none">
+                <div class="ocr-progress">
+                    <div class="ocr-progress-icon">🔍</div>
+                    <div class="ocr-progress-title" id="ocrTitle">OCR verwerkt afbeeldingen…</div>
+                    <div class="progress-track"><div class="progress-bar" id="ocrBar"></div></div>
+                    <div class="ocr-progress-detail" id="ocrDetail">Afbeelding laden…</div>
+                </div>
+            </div>
+
+            <!-- Step 4: OCR review -->
+            <div id="step4" style="display:none">
+                <div class="review-tip">
+                    <strong>Controleer de herkende tekst</strong> — OCR is niet altijd perfect.
+                    Bekijk de tekst hieronder en pas eventuele fouten aan voordat u opslaat.
+                    U kunt ook handmatig tekst toevoegen als OCR weinig herkend heeft.
+                </div>
+
+                <div class="review-panel">
+                    <div class="review-panel-title">Inhoudsopgave</div>
+                    <div class="review-confidence" id="tocConfidence"></div>
+                    <textarea class="ocr-text" id="tocText" placeholder="Geen tekst herkend — typ hoofdstukken handmatig, één per regel:
+Soepen en voorgerechten 14
+Wild en gevogelte 46
+Vis en zeevruchten 88
+Groenten en salades 124"></textarea>
+                    <div class="review-preview" id="tocPreview">
+                        <div class="review-preview-title">Herkende hoofdstukken</div>
+                        <div id="tocPreviewContent"></div>
+                    </div>
+                </div>
+
+                <div class="review-panel">
+                    <div class="review-panel-title">Ingrediëntenindex</div>
+                    <div class="review-confidence" id="ingConfidence"></div>
+                    <textarea class="ocr-text" id="ingText" placeholder="Geen tekst herkend — typ ingrediënten handmatig:
+aardappelen 14, 45, 67
+champignons 22, 88
+kip 33, 44, 102"></textarea>
+                    <div class="review-preview" id="ingPreview">
+                        <div class="review-preview-title">Herkende ingrediënten</div>
+                        <div id="ingPreviewContent"></div>
+                    </div>
+                </div>
+
+                <div class="review-actions">
+                    <button id="parsePreviewBtn" class="btn-outline">👁 Bekijk resultaat</button>
+                    <button id="saveBookBtn" class="btn-green">💾 Opslaan</button>
+                </div>
+                <div style="margin-top:10px">
+                    <button id="cancelReviewBtn" class="btn-outline">← Annuleren &amp; opnieuw beginnen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BROWSE TAB ===== -->
+        <div id="tabBrowse" class="tab-content">
+            <div id="browseStats" class="browse-stats" style="display:none">
+                <div class="stat-card">
+                    <span class="stat-number" id="statBooks">0</span>
+                    <span class="stat-label">Kookboeken</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="statChapters">0</span>
+                    <span class="stat-label">Hoofdstukken</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="statIngredients">0</span>
+                    <span class="stat-label">Ingrediënten</span>
+                </div>
+            </div>
+
+            <div id="globalSearchBox" class="search-box" style="display:none">
+                <label>Zoek ingrediënt in alle kookboeken</label>
+                <input type="text" id="globalSearch" placeholder="bijv. kip, tomaat, champignon…">
+            </div>
+
+            <div id="searchResults"></div>
+
+            <div id="cookbookGrid" class="cookbook-grid"></div>
+
+            <div id="browseEmpty" class="empty-state">
+                <p>Nog geen kookboeken toegevoegd.</p>
+                <p>Ga naar "Kookboek toevoegen" om te beginnen.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== COOKBOOK DETAIL MODAL ===== -->
+<div class="modal-overlay" id="cookbookModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-cover" id="modalCover">📖</div>
+            <div class="modal-info">
+                <h2 id="modalTitle"></h2>
+                <div class="modal-author" id="modalAuthor"></div>
+                <div class="modal-isbn"     id="modalIsbn"></div>
+                <div class="modal-added-by" id="modalAddedBy"></div>
+            </div>
+            <button class="modal-close" id="modalCloseBtn" style="width:30px;height:30px">×</button>
+        </div>
+
+        <div class="modal-tabs">
+            <button class="modal-tab-btn active" data-mtab="mtabChapters">Hoofdstukken</button>
+            <button class="modal-tab-btn" data-mtab="mtabIngredients">Ingrediënten</button>
+            <button class="modal-tab-btn" data-mtab="mtabManage">Beheren</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Chapters -->
+            <div id="mtabChapters" class="modal-tab-pane active">
+                <div id="chapterList"></div>
+                <div id="chapterIngs" style="display:none;margin-top:1.2rem">
+                    <div class="card-title" id="chapterIngTitle" style="margin-bottom:0.75rem"></div>
+                    <div id="chapterIngList"></div>
+                </div>
+            </div>
+
+            <!-- Ingredients search -->
+            <div id="mtabIngredients" class="modal-tab-pane">
+                <div style="margin-bottom:1rem">
+                    <input type="text" id="modalIngSearch" placeholder="Zoek op ingrediënt…">
+                </div>
+                <div id="modalIngList"></div>
+            </div>
+
+            <!-- Manage -->
+            <div id="mtabManage" class="modal-tab-pane">
+                <div class="form-group">
+                    <label>Titel</label>
+                    <input type="text" id="editTitle">
+                </div>
+                <div class="form-group">
+                    <label>Auteur</label>
+                    <input type="text" id="editAuthor">
+                </div>
+                <div class="form-group">
+                    <label>ISBN</label>
+                    <input type="text" id="editIsbn">
+                </div>
+                <button id="saveEditBtn" class="btn-green" style="margin-bottom:0.75rem">Wijzigingen opslaan</button>
+                <div style="border-top:1px solid var(--light-tan);padding-top:1rem;margin-top:0.5rem">
+                    <button id="deleteBookBtn" class="btn-danger">🗑 Kookboek verwijderen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signOut, onAuthStateChanged, sendPasswordResetEmail,
+    setPersistence, browserLocalPersistence, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import {
+    getFirestore, collection, addDoc, doc, deleteDoc, updateDoc,
+    query, orderBy, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// ===== FIREBASE =====
+const firebaseConfig = {
+    apiKey: "AIzaSyC61fB06PkQkB0EIK8C8zjvyUNQDajnztE",
+    authDomain: "cookbook-app-50168.firebaseapp.com",
+    projectId: "cookbook-app-50168",
+    storageBucket: "cookbook-app-50168.firebasestorage.app",
+    messagingSenderId: "764959426777",
+    appId: "1:764959426777:web:0331e7cce24252508956c8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+setPersistence(auth, browserLocalPersistence);
+
+// ===== STATE =====
+const state = {
+    user: null,
+    cookbooks: [],
+    pendingFiles: [],
+    ocr: { toc: { text: '', confidence: 0 }, ing: { text: '', confidence: 0 } },
+    activeCookbook: null,
+};
+
+// ===== AUTH SCREENS =====
+function showAuthScreen(id) {
+    ['screenLogin','screenSignup','screenForgot'].forEach(s =>
+        document.getElementById(s).style.display = s === id ? 'block' : 'none'
+    );
+}
+
+document.getElementById('toSignupBtn')  .addEventListener('click', () => showAuthScreen('screenSignup'));
+document.getElementById('toLoginBtn')   .addEventListener('click', () => showAuthScreen('screenLogin'));
+document.getElementById('showForgotBtn').addEventListener('click', () => showAuthScreen('screenForgot'));
+document.getElementById('backToLoginBtn').addEventListener('click', () => showAuthScreen('screenLogin'));
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = get('loginEmail').value.trim();
+    const pass  = get('loginPass').value;
+    const err   = get('loginErr');
+    if (!email || !pass) { setStatus(err, 'Vul alle velden in', 'error'); return; }
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        err.classList.remove('show');
+    } catch (e) { setStatus(err, firebaseErr(e.code), 'error'); }
+});
+
+document.getElementById('signupBtn').addEventListener('click', async () => {
+    const email = get('signupEmail').value.trim();
+    const pass  = get('signupPass').value;
+    const name  = get('signupName').value.trim();
+    const err   = get('signupErr');
+    if (!email || !pass || !name) { setStatus(err, 'Vul alle velden in', 'error'); return; }
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await updateProfile(cred.user, { displayName: name });
+        err.classList.remove('show');
+    } catch (e) { setStatus(err, firebaseErr(e.code), 'error'); }
+});
+
+document.getElementById('forgotSendBtn').addEventListener('click', async () => {
+    const email = get('forgotEmail').value.trim();
+    const msg   = get('forgotMsg');
+    if (!email) { setStatus(msg, 'Vul uw e-mailadres in', 'error'); return; }
+    try {
+        await sendPasswordResetEmail(auth, email);
+        setStatus(msg, '✓ E-mail verstuurd! Controleer uw inbox.', 'success');
+    } catch (e) { setStatus(msg, firebaseErr(e.code), 'error'); }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+function firebaseErr(code) {
+    return ({
+        'auth/user-not-found'     : 'Geen account gevonden met dit e-mailadres.',
+        'auth/wrong-password'     : 'Onjuist wachtwoord.',
+        'auth/invalid-credential' : 'Onjuiste inloggegevens.',
+        'auth/invalid-email'      : 'Ongeldig e-mailadres.',
+        'auth/email-already-in-use': 'Dit e-mailadres is al in gebruik.',
+        'auth/weak-password'      : 'Wachtwoord moet minimaal 6 tekens zijn.',
+        'auth/too-many-requests'  : 'Te veel pogingen. Probeer later opnieuw.',
+    })[code] || `Inlogfout (${code})`;
+}
+
+// ===== AUTH STATE =====
+onAuthStateChanged(auth, user => {
+    if (user) {
+        state.user = user;
+        get('userDisplay').textContent = user.displayName || user.email.split('@')[0];
+        get('authContainer').style.display = 'none';
+        get('appContainer').style.display  = 'block';
+        loadCookbooks();
+    } else {
+        state.user = null;
+        get('authContainer').style.display = 'block';
+        get('appContainer').style.display  = 'none';
+    }
+});
+
+// ===== TABS =====
+document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', e => {
+    const id = e.currentTarget.dataset.tab;
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn')    .forEach(b => b.classList.remove('active'));
+    get(id).classList.add('active');
+    e.currentTarget.classList.add('active');
+}));
+
+// ===== ISBN LOOKUP =====
+get('isbnSearchBtn').addEventListener('click', lookupISBN);
+get('isbnInput').addEventListener('keypress', e => { if (e.key === 'Enter') lookupISBN(); });
+
+async function lookupISBN() {
+    const isbn = get('isbnInput').value.trim().replace(/[-\s]/g, '');
+    if (!isbn) return;
+    setUploadStatus('ISBN wordt opgezocht…', 'processing');
+    try {
+        // Open Library
+        const ol = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`).then(r => r.json());
+        if (ol[`ISBN:${isbn}`]) {
+            const b = ol[`ISBN:${isbn}`];
+            get('titleInput').value  = b.title || '';
+            get('authorInput').value = b.authors?.[0]?.name || '';
+            setUploadStatus(`✓ "${b.title}" gevonden!`, 'success');
+            setTimeout(clearUploadStatus, 2500);
+            return;
         }
-    </script>
+        // Google Books fallback
+        const gb = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`).then(r => r.json());
+        if (gb.items?.length > 0) {
+            const b = gb.items[0].volumeInfo;
+            get('titleInput').value  = b.title || '';
+            get('authorInput').value = b.authors?.[0] || '';
+            setUploadStatus(`✓ "${b.title}" gevonden!`, 'success');
+            setTimeout(clearUploadStatus, 2500);
+            return;
+        }
+        setUploadStatus('ISBN niet gevonden. Vul gegevens handmatig in.', 'error');
+    } catch {
+        setUploadStatus('Fout bij opzoeken. Controleer uw internetverbinding.', 'error');
+    }
+}
+
+// ===== FILE SELECTION =====
+get('cameraBtn') .addEventListener('click', () => get('cameraInput').click());
+get('galleryBtn').addEventListener('click', () => get('fileInput').click());
+get('cameraInput').addEventListener('change', e => handleFiles(e.target.files));
+get('fileInput')  .addEventListener('change', e => handleFiles(e.target.files));
+
+function handleFiles(files) {
+    if (!files?.length) return;
+    state.pendingFiles = Array.from(files);
+    renderPhotoPreview();
+}
+
+function renderPhotoPreview() {
+    const labels = ['Inhoudsopgave', 'Ingrediëntenindex', 'Extra foto'];
+    get('photoList').innerHTML = state.pendingFiles.map((f, i) => {
+        const url  = URL.createObjectURL(f);
+        const size = (f.size / 1024).toFixed(0) + ' KB';
+        return `<div class="photo-item">
+            <img class="photo-thumb" src="${url}" alt="">
+            <div>
+                <div class="photo-label">${labels[i] ?? `Foto ${i+1}`}</div>
+                <div class="photo-size">${esc(f.name)} · ${size}</div>
+            </div>
+        </div>`;
+    }).join('');
+    get('photoPreview').style.display = 'block';
+}
+
+get('processBtn').addEventListener('click', startOCR);
+
+// ===== OCR =====
+async function startOCR() {
+    const title = get('titleInput').value.trim();
+    if (!title) { setUploadStatus('Voer eerst een kookboektitel in (Stap 1)', 'error'); return; }
+    if (!state.pendingFiles.length) { setUploadStatus('Selecteer eerst foto\'s (Stap 2)', 'error'); return; }
+
+    get('step1').style.display = 'none';
+    get('step2').style.display = 'none';
+    get('step3').style.display = 'block';
+    clearUploadStatus();
+
+    state.ocr = { toc: { text: '', confidence: 0 }, ing: { text: '', confidence: 0 } };
+
+    const files = state.pendingFiles.slice(0, 2);
+
+    for (let i = 0; i < files.length; i++) {
+        const label = i === 0 ? 'inhoudsopgave' : 'ingrediëntenindex';
+        const baseP = i / files.length * 50;
+
+        get('ocrTitle') .textContent = `${i + 1}/${files.length} — ${label} verwerken…`;
+        setOCRProgress(baseP, `${label} laden…`);
+
+        try {
+            const result = await Tesseract.recognize(files[i], 'nld', {
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        setOCRProgress(baseP + m.progress / files.length * 50,
+                            `${label}: ${Math.round(m.progress * 100)}%`);
+                    }
+                }
+            });
+            const key = i === 0 ? 'toc' : 'ing';
+            state.ocr[key] = { text: result.data.text, confidence: result.data.confidence };
+        } catch (e) {
+            console.error('OCR error:', e);
+        }
+    }
+
+    setOCRProgress(100, 'Klaar!');
+    await pause(600);
+    get('step3').style.display = 'none';
+    showReview();
+}
+
+function setOCRProgress(pct, detail) {
+    get('ocrBar').style.width    = pct + '%';
+    get('ocrDetail').textContent = detail;
+}
+
+function showReview() {
+    get('step4').style.display = 'block';
+    get('tocText').value = state.ocr.toc.text;
+    get('ingText').value = state.ocr.ing.text;
+
+    const tocC = state.ocr.toc.confidence;
+    const ingC = state.ocr.ing.confidence;
+
+    const tocEl = get('tocConfidence');
+    const ingEl = get('ingConfidence');
+
+    if (tocC > 0) {
+        tocEl.textContent = `OCR betrouwbaarheid: ${Math.round(tocC)}%`;
+        tocEl.style.color = tocC > 70 ? 'var(--olive-green)' : tocC > 45 ? 'var(--accent-gold)' : 'var(--burnt-orange)';
+    } else {
+        tocEl.textContent = 'Geen foto verwerkt — voer tekst handmatig in';
+        tocEl.style.color = 'var(--accent-gold)';
+    }
+
+    if (ingC > 0) {
+        ingEl.textContent = `OCR betrouwbaarheid: ${Math.round(ingC)}%`;
+        ingEl.style.color = ingC > 70 ? 'var(--olive-green)' : ingC > 45 ? 'var(--accent-gold)' : 'var(--burnt-orange)';
+    } else {
+        ingEl.textContent = 'Geen foto verwerkt — voer tekst handmatig in';
+        ingEl.style.color = 'var(--accent-gold)';
+    }
+
+    updatePreviews();
+}
+
+get('parsePreviewBtn').addEventListener('click', updatePreviews);
+
+function updatePreviews() {
+    const chapters    = extractChapters(get('tocText').value);
+    const ingredients = extractIngredients(get('ingText').value);
+
+    const tocPrev = get('tocPreview');
+    const tocCont = get('tocPreviewContent');
+    if (chapters.length > 0) {
+        tocCont.innerHTML = chapters.map(c =>
+            `<span class="preview-tag">📖 ${esc(c.name)}${c.startPage ? ' · p.' + c.startPage : ''}</span>`
+        ).join('');
+    } else {
+        tocCont.innerHTML = '<span style="font-size:12px;color:var(--burnt-orange);font-style:italic">Geen hoofdstukken herkend — pas de tekst aan.</span>';
+    }
+    tocPrev.style.display = 'block';
+
+    const ingPrev = get('ingPreview');
+    const ingCont = get('ingPreviewContent');
+    if (ingredients.length > 0) {
+        const first = ingredients.slice(0, 25).map(i =>
+            `<span class="preview-tag">${esc(i.name)}${i.pages ? ' · ' + i.pages : ''}</span>`
+        ).join('');
+        const more = ingredients.length > 25
+            ? `<span class="preview-tag" style="opacity:0.5">+${ingredients.length - 25} meer</span>` : '';
+        ingCont.innerHTML = first + more;
+    } else {
+        ingCont.innerHTML = '<span style="font-size:12px;color:var(--burnt-orange);font-style:italic">Geen ingrediënten herkend — pas de tekst aan.</span>';
+    }
+    ingPrev.style.display = 'block';
+}
+
+get('saveBookBtn')     .addEventListener('click', saveCookbook);
+get('cancelReviewBtn') .addEventListener('click', resetUpload);
+
+async function saveCookbook() {
+    const title  = get('titleInput').value.trim();
+    const author = get('authorInput').value.trim();
+    const isbn   = get('isbnInput').value.trim().replace(/[-\s]/g, '');
+
+    const chapters    = extractChapters(get('tocText').value);
+    const ingredients = extractIngredients(get('ingText').value);
+
+    // Fetch cover from Google Books
+    let coverImageUrl = null;
+    if (isbn) {
+        try {
+            const gb = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`).then(r => r.json());
+            const thumb = gb.items?.[0]?.volumeInfo?.imageLinks?.thumbnail;
+            if (thumb) coverImageUrl = thumb.replace('http://', 'https://');
+        } catch { /* no cover */ }
+    }
+
+    setUploadStatus('Opslaan…', 'processing');
+    try {
+        await addDoc(collection(db, 'cookbooks'), {
+            userId     : state.user.uid,
+            addedBy    : state.user.displayName || state.user.email.split('@')[0],
+            title, author: author || null, isbn: isbn || null, coverImageUrl,
+            chapters, ingredients,
+            ocrConfidence: { toc: state.ocr.toc.confidence, ing: state.ocr.ing.confidence },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        setUploadStatus(`✓ "${title}" toegevoegd aan de bibliotheek!`, 'success');
+        resetUpload();
+        setTimeout(() => {
+            switchTab('tabBrowse');
+            clearUploadStatus();
+        }, 1200);
+    } catch (e) {
+        setUploadStatus('Fout bij opslaan: ' + e.message, 'error');
+    }
+}
+
+function resetUpload() {
+    ['step1','step2'].forEach(id => get(id).style.display = 'block');
+    ['step3','step4'].forEach(id => get(id).style.display = 'none');
+    get('photoPreview').style.display = 'none';
+    get('photoList').innerHTML = '';
+    ['tocPreview','ingPreview'].forEach(id => get(id).style.display = 'none');
+    ['tocText','ingText','titleInput','authorInput','isbnInput'].forEach(id => get(id).value = '');
+    get('cameraInput').value = get('fileInput').value = '';
+    state.pendingFiles = [];
+}
+
+// ===== OCR EXTRACTION =====
+function extractChapters(text) {
+    if (!text?.trim()) return [];
+    const chapters = [];
+
+    for (const rawLine of text.split('\n')) {
+        const line = rawLine.trim();
+        if (!line || line.length < 3 || line.length > 100) continue;
+        if (/^\d+$/.test(line)) continue;
+
+        // Pattern A: "Title text   42" or "Title text.....42"
+        const matchA = line.match(/^(.+?)[\s.]{1,}(\d{1,3})\s*$/);
+        if (matchA) {
+            const name = matchA[1].replace(/[.\s]+$/, '').trim();
+            const page = parseInt(matchA[2]);
+            if (name.length >= 3 && !/^\d/.test(name)) {
+                chapters.push({ name, startPage: page });
+            }
+        }
+    }
+
+    // Pattern B: two-line format (name on one line, page on next)
+    if (chapters.length === 0) {
+        const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+        for (let i = 0; i < lines.length - 1; i++) {
+            const line = lines[i], next = lines[i + 1];
+            if (/^\d{1,3}$/.test(next) && line.length >= 3 && !/^\d/.test(line)) {
+                chapters.push({ name: line, startPage: parseInt(next) });
+                i++;
+            }
+        }
+    }
+
+    return chapters;
+}
+
+function extractIngredients(text) {
+    if (!text?.trim()) return [];
+    const ingredients = [];
+    const seen = new Set();
+
+    for (const rawLine of text.split('\n')) {
+        const line = rawLine.trim();
+        if (!line || line.length < 2) continue;
+
+        // Match: ingredient name (may include Dutch accented chars) + optional page list
+        const m = line.match(/^([A-Za-zÀ-ÿ\s\-'()]+?)(?:\s+([\d\s,;/\-]+))?\s*$/);
+        if (!m) continue;
+
+        const name  = m[1].trim().toLowerCase();
+        const pages = m[2] ? m[2].trim().replace(/\s+/g, ' ') : null;
+
+        if (name.length < 2 || name.length > 60) continue;
+        if (/^\d/.test(name)) continue;
+        // Filter common stop words
+        if (/^(en|de|het|een|van|aan|op|in|uit|met|voor|bij|ook|page|blz|zie|p)\s*$/.test(name)) continue;
+        if (seen.has(name)) continue;
+
+        seen.add(name);
+        ingredients.push({ name, pages });
+    }
+    return ingredients;
+}
+
+// ===== FIRESTORE =====
+function loadCookbooks() {
+    // Query ALL cookbooks — shared family library
+    const q = query(collection(db, 'cookbooks'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snap => {
+        state.cookbooks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderBrowse();
+    }, err => {
+        // Fallback without orderBy if index missing
+        console.warn('Query error, trying without orderBy:', err.message);
+        onSnapshot(collection(db, 'cookbooks'), snap => {
+            state.cookbooks = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+            renderBrowse();
+        });
+    });
+}
+
+// ===== BROWSE =====
+function renderBrowse() {
+    const grid  = get('cookbookGrid');
+    const empty = get('browseEmpty');
+    const stats = get('browseStats');
+    const sb    = get('globalSearchBox');
+
+    if (!state.cookbooks.length) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        stats.style.display = sb.style.display = 'none';
+        return;
+    }
+
+    empty.style.display = 'none';
+    stats.style.display = 'grid';
+    sb.style.display    = 'block';
+
+    const totalChapters    = state.cookbooks.reduce((s, cb) => s + (cb.chapters?.length    || 0), 0);
+    const totalIngredients = state.cookbooks.reduce((s, cb) => s + (cb.ingredients?.length || 0), 0);
+
+    get('statBooks')      .textContent = state.cookbooks.length;
+    get('statChapters')   .textContent = totalChapters;
+    get('statIngredients').textContent = totalIngredients;
+
+    grid.innerHTML = state.cookbooks.map(cb => {
+        const cover = cb.coverImageUrl
+            ? `<div class="cookbook-cover"><img src="${esc(cb.coverImageUrl)}" alt="" onerror="this.parentElement.innerHTML='📖'"></div>`
+            : `<div class="cookbook-cover">📖</div>`;
+        return `<div class="cookbook-card" onclick="openCookbook('${cb.id}')">
+            ${cover}
+            <div class="cookbook-card-body">
+                <div class="cookbook-card-title">${esc(cb.title)}</div>
+                ${cb.author ? `<div class="cookbook-card-author">${esc(cb.author)}</div>` : ''}
+                <div class="cookbook-card-stats">${cb.chapters?.length || 0} hfst · ${cb.ingredients?.length || 0} ingr</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ===== GLOBAL INGREDIENT SEARCH =====
+get('globalSearch').addEventListener('input', e => {
+    const q     = e.target.value.trim().toLowerCase();
+    const resEl = get('searchResults');
+    if (!q) { resEl.innerHTML = ''; return; }
+
+    const hits = [];
+    for (const cb of state.cookbooks) {
+        for (const ing of (cb.ingredients || [])) {
+            if (ing.name.includes(q)) hits.push({ ...ing, bookTitle: cb.title, bookId: cb.id });
+        }
+    }
+
+    if (!hits.length) {
+        resEl.innerHTML = `<div class="empty-state"><p>Geen resultaten voor "${esc(q)}"</p></div>`;
+        return;
+    }
+
+    const shown = hits.slice(0, 60);
+    resEl.innerHTML = shown.map(h => `
+        <div class="search-result" onclick="openCookbook('${h.bookId}')">
+            <div class="search-result-name">${esc(h.name)}</div>
+            <div class="search-result-meta">${esc(h.bookTitle)} · p. ${h.pages || '?'}</div>
+        </div>`).join('')
+        + (hits.length > 60 ? `<p style="font-size:12px;text-align:center;color:var(--warm-orange);padding:0.5rem">+${hits.length - 60} meer. Zoek specifieker.</p>` : '');
+});
+
+// ===== COOKBOOK DETAIL MODAL =====
+window.openCookbook = function(id) {
+    const cb = state.cookbooks.find(c => c.id === id);
+    if (!cb) return;
+    state.activeCookbook = cb;
+
+    get('modalTitle')  .textContent = cb.title;
+    get('modalAuthor') .textContent = cb.author || '';
+    get('modalIsbn')   .textContent = cb.isbn ? `ISBN: ${cb.isbn}` : '';
+    get('modalAddedBy').textContent = cb.addedBy ? `Toegevoegd door ${cb.addedBy}` : '';
+
+    const coverEl = get('modalCover');
+    coverEl.innerHTML = cb.coverImageUrl
+        ? `<img src="${esc(cb.coverImageUrl)}" alt="" onerror="this.innerHTML='📖'">`
+        : '📖';
+
+    get('editTitle') .value = cb.title;
+    get('editAuthor').value = cb.author || '';
+    get('editIsbn')  .value = cb.isbn   || '';
+    get('modalIngSearch').value = '';
+
+    switchModalTab('mtabChapters');
+    renderModalChapters(cb);
+    renderModalIngredients(cb, '');
+
+    get('cookbookModal').classList.add('show');
+};
+
+get('modalCloseBtn').addEventListener('click', closeModal);
+get('cookbookModal').addEventListener('click', e => { if (e.target === get('cookbookModal')) closeModal(); });
+function closeModal() { get('cookbookModal').classList.remove('show'); }
+
+// Modal tabs
+document.querySelectorAll('.modal-tab-btn').forEach(btn => btn.addEventListener('click', e => {
+    switchModalTab(e.currentTarget.dataset.mtab);
+}));
+
+function switchModalTab(id) {
+    document.querySelectorAll('.modal-tab-btn') .forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.modal-tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelector(`[data-mtab="${id}"]`).classList.add('active');
+    get(id).classList.add('active');
+}
+
+function renderModalChapters(cb) {
+    const listEl = get('chapterList');
+    get('chapterIngs').style.display = 'none';
+
+    if (!cb.chapters?.length) {
+        listEl.innerHTML = '<div class="empty-state"><p>Geen hoofdstukken gevonden.</p><p>Gebruik "Beheren" om dit kookboek aan te passen.</p></div>';
+        return;
+    }
+
+    listEl.innerHTML = cb.chapters.map((ch, i) => `
+        <div class="chapter-item" id="chi-${i}" onclick="selectChapter(${i})">
+            <span>${esc(ch.name)}</span>
+            ${ch.startPage ? `<span class="chapter-page">p. ${ch.startPage}</span>` : ''}
+        </div>`).join('');
+}
+
+window.selectChapter = function(idx) {
+    const cb = state.activeCookbook;
+    if (!cb) return;
+
+    document.querySelectorAll('.chapter-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+
+    const chapter     = cb.chapters[idx];
+    const nextChapter = cb.chapters[idx + 1];
+    const startPage   = chapter.startPage || null;
+    const endPage     = nextChapter?.startPage ? nextChapter.startPage - 1 : 9999;
+
+    let ings = cb.ingredients || [];
+    if (startPage) {
+        ings = ings.filter(ing => {
+            if (!ing.pages) return false;
+            const nums = ing.pages.split(/[\s,;/]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+            return nums.some(n => n >= startPage && n <= endPage);
+        });
+    }
+
+    const pageRange = startPage
+        ? ` (p. ${startPage}–${endPage === 9999 ? '…' : endPage})`
+        : '';
+
+    get('chapterIngTitle').textContent = chapter.name + pageRange;
+    get('chapterIngList').innerHTML = ings.length
+        ? `<div class="ing-list">${ings.map(i => `
+            <div class="ing-item">
+                <span class="ing-name">${esc(i.name)}</span>
+                <span class="ing-pages">${i.pages || '–'}</span>
+            </div>`).join('')}</div>`
+        : '<p style="font-size:13px;color:var(--warm-orange);font-style:italic;margin-top:0.5rem">Geen ingrediënten gevonden voor dit hoofdstukbereik.</p>';
+
+    get('chapterIngs').style.display = 'block';
+};
+
+function renderModalIngredients(cb, query) {
+    let ings = cb.ingredients || [];
+    if (query) ings = ings.filter(i => i.name.includes(query.toLowerCase()));
+
+    get('modalIngList').innerHTML = ings.length
+        ? `<div class="ing-list">${ings.map(i => `
+            <div class="ing-item">
+                <span class="ing-name">${esc(i.name)}</span>
+                <span class="ing-pages">${i.pages || '–'}</span>
+            </div>`).join('')}</div>`
+        : `<div class="empty-state"><p>${query ? `Geen resultaten voor "${esc(query)}"` : 'Geen ingrediënten.'}</p></div>`;
+}
+
+get('modalIngSearch').addEventListener('input', e => {
+    if (state.activeCookbook) renderModalIngredients(state.activeCookbook, e.target.value.trim());
+});
+
+// ===== EDIT / DELETE =====
+get('saveEditBtn').addEventListener('click', async () => {
+    const cb    = state.activeCookbook;
+    const title = get('editTitle').value.trim();
+    if (!title) { alert('Titel mag niet leeg zijn.'); return; }
+    try {
+        await updateDoc(doc(db, 'cookbooks', cb.id), {
+            title,
+            author: get('editAuthor').value.trim() || null,
+            isbn  : get('editIsbn').value.trim()   || null,
+            updatedAt: new Date(),
+        });
+        closeModal();
+    } catch (e) { alert('Fout bij opslaan: ' + e.message); }
+});
+
+get('deleteBookBtn').addEventListener('click', async () => {
+    const cb = state.activeCookbook;
+    if (!confirm(`Weet u zeker dat u "${cb.title}" wilt verwijderen?\nDit kan niet ongedaan worden gemaakt.`)) return;
+    try {
+        await deleteDoc(doc(db, 'cookbooks', cb.id));
+        closeModal();
+    } catch (e) { alert('Fout bij verwijderen: ' + e.message); }
+});
+
+// ===== UTILITIES =====
+function get(id)             { return document.getElementById(id); }
+function pause(ms)           { return new Promise(r => setTimeout(r, ms)); }
+function esc(s)              { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function setStatus(el, msg, type) {
+    el.textContent = msg;
+    el.className   = `status show ${type}`;
+}
+
+function setUploadStatus(msg, type) {
+    setStatus(get('uploadStatus'), msg, type);
+}
+
+function clearUploadStatus() {
+    get('uploadStatus').classList.remove('show');
+}
+
+function switchTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn')    .forEach(b => b.classList.remove('active'));
+    get(id).classList.add('active');
+    document.querySelector(`[data-tab="${id}"]`).classList.add('active');
+}
+</script>
 </body>
 </html>
