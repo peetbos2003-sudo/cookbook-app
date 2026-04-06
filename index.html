@@ -15,32 +15,32 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --cream: #faf8f3;
+            --cream: #ffffff;
             --warm-orange: #d97956;
             --burnt-orange: #c85a3a;
             --olive-green: #6b8e5f;
             --sage-green: #9cb5a0;
-            --dark-brown: #3e3025;
-            --light-tan: #f4ede3;
+            --dark-brown: #2c3428;
+            --light-tan: #edf0ea;
             --accent-gold: #c9a574;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --cream: #2a2420;
+                --cream: #1a201a;
                 --warm-orange: #e8956f;
                 --burnt-orange: #d97956;
                 --olive-green: #8faa7f;
                 --sage-green: #a8c9a0;
-                --dark-brown: #f4ede3;
-                --light-tan: #3e3025;
+                --dark-brown: #e8ede5;
+                --light-tan: #232b22;
                 --accent-gold: #d4b896;
             }
         }
 
         body {
             font-family: 'Georgia', 'Garamond', serif;
-            background: linear-gradient(135deg, var(--cream) 0%, var(--light-tan) 100%);
+            background: var(--light-tan);
             color: var(--dark-brown);
             line-height: 1.8;
             min-height: 100vh;
@@ -126,8 +126,8 @@
 
         /* ===== FORM ELEMENTS ===== */
         .card {
-            background: var(--light-tan);
-            border: 2px solid var(--olive-green);
+            background: var(--cream);
+            border: 1.5px solid #d4dbd0;
             border-radius: 14px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
@@ -831,12 +831,12 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" data-tab="tabUpload">Kookboek toevoegen</button>
-            <button class="tab-btn" data-tab="tabBrowse">Bladeren &amp; zoeken</button>
+            <button class="tab-btn active" data-tab="tabBrowse">Bladeren</button>
+            <button class="tab-btn" data-tab="tabUpload">Kookboek toevoegen</button>
         </div>
 
         <!-- ===== UPLOAD TAB ===== -->
-        <div id="tabUpload" class="tab-content active">
+        <div id="tabUpload" class="tab-content">
             <div id="uploadStatus" class="status"></div>
 
             <!-- Step 1: Book info -->
@@ -846,18 +846,18 @@
                 <div class="form-group">
                     <label>ISBN-nummer (optioneel)</label>
                     <div class="inline-row">
-                        <input type="text" id="isbnInput" placeholder="bijv. 9781445425641">
+                        <input type="text" id="isbnInput" placeholder="bijv. 9781445425641" autocomplete="off">
                         <button type="button" id="isbnScanBtn" class="btn-sm btn-outline" title="Scan barcode met camera">📷 Scan</button>
                         <button type="button" id="isbnSearchBtn" class="btn-sm btn-green">Zoeken</button>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Titel <span style="color:var(--burnt-orange)">*</span></label>
-                    <input type="text" id="titleInput" placeholder="bijv. De keuken van Frankrijk">
+                    <input type="text" id="titleInput" placeholder="bijv. De keuken van Frankrijk" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>Auteur (optioneel)</label>
-                    <input type="text" id="authorInput" placeholder="bijv. Beverley Le Blanc">
+                    <input type="text" id="authorInput" placeholder="bijv. Beverley Le Blanc" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>Cover foto (optioneel)</label>
@@ -870,6 +870,9 @@
                             <div style="font-size:11px;color:#999;margin-top:4px">Foto van de voorkant van het boek</div>
                         </div>
                     </div>
+                </div>
+                <div style="margin-top:1.25rem">
+                    <button type="button" id="quickSaveBtn" class="btn-green" disabled style="width:100%;font-size:15px">Opslaan</button>
                 </div>
             </div>
 
@@ -956,7 +959,19 @@ kip 33, 44, 102"></textarea>
         </div>
 
         <!-- ===== BROWSE TAB ===== -->
-        <div id="tabBrowse" class="tab-content">
+        <div id="tabBrowse" class="tab-content active">
+
+            <!-- Hero cover photo -->
+            <div id="heroCover" style="position:relative;width:100%;height:180px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,var(--olive-green),var(--sage-green));margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center">
+                <div id="heroCoverEmpty" style="text-align:center;color:rgba(255,255,255,0.9)">
+                    <div style="font-size:42px">📚</div>
+                    <div style="font-size:15px;margin-top:0.4rem;font-weight:700;letter-spacing:0.5px">Parklaankookboeken</div>
+                    <div style="font-size:11px;margin-top:0.2rem;opacity:0.8">Klik om een omslagfoto in te stellen</div>
+                </div>
+                <img id="heroCoverImg" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+                <button id="heroCoverBtn" style="position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,0.88);border:none;border-radius:20px;padding:5px 11px;font-size:11px;cursor:pointer;color:var(--dark-brown);font-family:inherit">📷 Foto instellen</button>
+                <input type="file" id="heroCoverInput" accept="image/*" style="display:none">
+            </div>
 
             <!-- Category filter buttons -->
             <div id="categoryFilters" class="category-filters" style="display:none">
@@ -985,7 +1000,7 @@ kip 33, 44, 102"></textarea>
 
             <!-- Global ingredient search -->
             <div id="globalSearchBox" class="search-box" style="display:none">
-                <label>Zoek in alle kookboeken — ingrediënten &amp; hoofdstukken</label>
+                <label>Zoek recepten of ingrediënten</label>
                 <div class="inline-row">
                     <input type="text" id="globalSearch" placeholder="bijv. soep, kip, bonen, chocolade…">
                     <button id="globalSearchBtn" class="btn-sm btn-green">Zoek</button>
@@ -1083,7 +1098,7 @@ kip 33, 44, 102"></textarea>
                     <label>ISBN</label>
                     <input type="text" id="editIsbn">
                 </div>
-                <button id="saveEditBtn" class="btn-green" style="margin-bottom:0.75rem">Wijzigingen opslaan</button>
+                <button id="saveEditBtn" class="btn-green" style="margin-bottom:0.75rem">Opslaan</button>
 
                 <div style="border-top:1px solid var(--light-tan);padding-top:1rem;margin-top:0.5rem">
                     <div class="card-title" style="margin-bottom:0.4rem">Foto's verwerken</div>
@@ -1271,6 +1286,31 @@ async function lookupISBN() {
     }
 }
 
+// ===== HERO COVER PHOTO =====
+(function() {
+    const KEY = 'pkb_hero';
+    const stored = localStorage.getItem(KEY);
+    if (stored) {
+        get('heroCoverImg').src = stored;
+        get('heroCoverImg').style.display = 'block';
+        get('heroCoverEmpty').style.display = 'none';
+        get('heroCoverBtn').textContent = '📷 Foto wijzigen';
+    }
+    get('heroCoverBtn').addEventListener('click', () => get('heroCoverInput').click());
+    get('heroCoverEmpty').addEventListener('click', () => get('heroCoverInput').click());
+    get('heroCoverInput').addEventListener('change', async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const dataUrl = await resizeCover(file, 900, 400);
+        localStorage.setItem(KEY, dataUrl);
+        get('heroCoverImg').src = dataUrl;
+        get('heroCoverImg').style.display = 'block';
+        get('heroCoverEmpty').style.display = 'none';
+        get('heroCoverBtn').textContent = '📷 Foto wijzigen';
+        e.target.value = '';
+    });
+})();
+
 // ===== COVER UPLOAD =====
 get('coverUploadBtn').addEventListener('click', () => get('coverFileInput').click());
 get('coverFileInput').addEventListener('change', async e => {
@@ -1304,6 +1344,47 @@ function resizeCover(file, maxW, maxH) {
         img.src = URL.createObjectURL(file);
     });
 }
+
+// ===== STEP 1 QUICK SAVE =====
+get('titleInput').addEventListener('input', () => {
+    get('quickSaveBtn').disabled = !get('titleInput').value.trim();
+});
+
+get('quickSaveBtn').addEventListener('click', async () => {
+    const title  = get('titleInput').value.trim();
+    const author = get('authorInput').value.trim();
+    const isbn   = get('isbnInput').value.trim().replace(/[-\s]/g, '');
+    if (!title) return;
+
+    let coverImageUrl = null;
+    if (!state.coverData && isbn) {
+        try {
+            const gb = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`).then(r => r.json());
+            const links = gb.items?.[0]?.volumeInfo?.imageLinks;
+            const thumb = links?.thumbnail || links?.smallThumbnail;
+            if (thumb) coverImageUrl = thumb.replace('http://', 'https://');
+        } catch {}
+        if (!coverImageUrl) coverImageUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
+    }
+
+    setUploadStatus('Opslaan…', 'processing');
+    get('quickSaveBtn').disabled = true;
+    try {
+        const data = { title, author: author || null, isbn: isbn || null, coverData: state.coverData || null, coverImageUrl, updatedAt: new Date() };
+        if (state.editingBookId) {
+            await updateDoc(doc(db, 'cookbooks', state.editingBookId), data);
+            setUploadStatus(`✓ "${title}" bijgewerkt!`, 'success');
+        } else {
+            await addDoc(collection(db, 'cookbooks'), { ...data, chapters: [], ingredients: [], userId: state.user.uid, addedBy: state.user.displayName || state.user.email.split('@')[0], createdAt: new Date() });
+            setUploadStatus(`✓ "${title}" toegevoegd!`, 'success');
+        }
+        state.editingBookId = null;
+        setTimeout(() => { switchTab('tabBrowse'); clearUploadStatus(); resetUpload(); }, 1200);
+    } catch(e) {
+        setUploadStatus('Fout bij opslaan: ' + e.message, 'error');
+        get('quickSaveBtn').disabled = false;
+    }
+});
 
 // ===== FILE SELECTION =====
 get('cameraBtn') .addEventListener('click', () => get('cameraInput').click());
